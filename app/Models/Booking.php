@@ -86,6 +86,11 @@ class Booking extends Model
         return $this->hasOne(Review::class);
     }
 
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
     public function getDurationDaysAttribute(): int
     {
         return $this->start_date->diffInDays($this->end_date);

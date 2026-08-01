@@ -146,7 +146,9 @@ class CustomerResource extends Resource
                     ->label('Active Status'),
                 Tables\Filters\SelectFilter::make('email')
                     ->label('Email')
-                    ->relationship('email', 'email'),
+                    ->multiple()
+                    ->options(fn () => \App\Models\Customer::whereNotNull('email')->distinct()->pluck('email', 'email'))
+                    ->searchable(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

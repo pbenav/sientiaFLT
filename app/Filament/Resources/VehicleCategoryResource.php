@@ -44,7 +44,7 @@ class VehicleCategoryResource extends Resource
                             ->label('Descripción')
                             ->columnSpan('full'),
 
-                        Forms\Components\Toggle::make('active')
+                        Forms\Components\Toggle::make('is_active')
                             ->label('Activa')
                             ->default(true),
                     ])

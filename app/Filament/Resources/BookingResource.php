@@ -15,6 +15,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Tables\Actions\ActionGroup;
 use Illuminate\Database\Eloquent\Builder;
 
 class BookingResource extends Resource
@@ -38,13 +39,10 @@ class BookingResource extends Resource
                             ->disabled(),
                         Forms\Components\Select::make('customer_id')
                             ->label('Customer')
-                            ->options(Customer::orderBy('first_name')->get()->pluck(function (Customer $customer) {
-                                return $customer->full_name;
-                            }, 'id'))
+                            ->options(Customer::orderBy('first_name')->pluck('full_name', 'id'))
                             ->searchable()
                             ->required()
-                            ->reactive()
-                            ->afterStateUpdated(fn ($state, Forms\Set $set) => $state ? $set('customer_id', $state) : null),
+                            ->reactive(),
                         Forms\Components\Select::make('vehicle_id')
                             ->label('Vehicle')
                             ->options(Vehicle::where('is_active', true)->orderBy('name')->get()->pluck('name', 'id'))
@@ -198,15 +196,20 @@ class BookingResource extends Resource
                 Tables\Filters\SelectFilter::make('start_date')
                     ->label('Booking From')
                     ->options(function () {
-                        return \App\Models\Booking::pluck('start_date', 'id')->mapWithKeys(fn($v, $k) => [$k => $v])->toArray();
+                        return \App\Models\Booking::whereNotNull('start_date')
+                            ->pluck('start_date', 'id')
+                            ->mapWithKeys(fn($date, $id) => [$id => $date->format('d/m/Y H:i')])
+                            ->toArray();
                     }),
                 Tables\Filters\SelectFilter::make('end_date')
                     ->label('Booking To'),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                ActionGroup::make([
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\ViewAction::make(),
+                    Tables\Actions\DeleteAction::make(),
+                ]),
                 Tables\Actions\BulkAction::make('confirmBooking')
                     ->label('Confirm Selected')
                     ->visible(fn ($table) => $table->getSelectedRecords()->where('status', 'pending')->count() > 0)
