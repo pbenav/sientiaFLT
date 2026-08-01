@@ -1,0 +1,807 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+
+    /* ExtraRent Color Palette - EXACT from Elementor Kit post-14.css */
+    --color-ex-primary: #161829;
+    --color-ex-secondary: #292D45;
+    --color-ex-text: #4C586C;
+    --color-ex-accent: #EA001E;
+    --color-ex-blue: #0056DE;
+    --color-ex-light: #F4F5F6;
+    --color-ex-gray: #C9C6C6;
+    --color-ex-gray-dark: #6E7684;
+    --color-ex-white: #FFFFFF;
+
+    /* Typography - Space Grotesk for headings, Lato for body */
+    --font-heading: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+    --font-body: 'Lato', ui-sans-serif, system-ui, sans-serif;
+}
+
+/* ============================================================
+    FONTS - Space Grotesk & Lato loaded from Google Fonts CDN
+    (link tag in layouts/app.blade.php)
+    ============================================================ */
+
+/* ============================================================
+   GLOBAL STYLES - Matching Extrarent WordPress
+   ============================================================ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Lato', ui-sans-serif, system-ui, sans-serif;
+    font-weight: 400;
+    color: #4C586C;
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+/* Headings - Space Grotesk font */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+    font-weight: 600;
+    color: #161829;
+    line-height: 1.3;
+}
+
+h1 { font-size: 3rem; }
+h2 { font-size: 2.5rem; }
+h3 { font-size: 1.875rem; }
+h4 { font-size: 1.5rem; }
+h5 { font-size: 1.25rem; }
+h6 { font-size: 1rem; }
+
+/* ============================================================
+   CONTAINER - Matching Elementor breakpoints
+   ============================================================ */
+.container-ex {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+@media (max-width: 1024px) {
+    .container-ex { max-width: 1024px; }
+}
+
+@media (max-width: 767px) {
+    .container-ex { max-width: 767px; }
+}
+
+/* Widget spacing matching Elementor */
+.widget-spacing > *:not(:last-child) {
+    margin-bottom: 20px;
+}
+
+/* ============================================================
+   HEADER / NAVIGATION - Extrarent style
+   ============================================================ */
+.ex-header {
+    background: #FFFFFF;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.ex-header-top {
+    background: #161829;
+    color: #FFFFFF;
+    padding: 8px 0;
+    font-size: 13px;
+}
+
+.ex-header-top a {
+    color: #C9C6C6;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.ex-header-top a:hover {
+    color: #FFFFFF;
+}
+
+.ex-header-main {
+    padding: 15px 0;
+}
+
+.ex-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.ex-nav-links {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.ex-nav-links a {
+    color: #161829;
+    text-decoration: none;
+    font-family: 'Lato', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 10px 0;
+    position: relative;
+    transition: color 0.2s;
+}
+
+.ex-nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: #EA001E;
+    transition: width 0.3s;
+}
+
+.ex-nav-links a:hover,
+.ex-nav-links a.active {
+    color: #EA001E;
+}
+
+.ex-nav-links a:hover::after,
+.ex-nav-links a.active::after {
+    width: 100%;
+}
+
+/* Navigation Dropdown */
+.ex-nav-links li {
+    position: relative;
+}
+
+.ex-nav-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: #fff;
+    min-width: 220px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.12);
+    border-radius: 8px;
+    padding: 8px 0;
+    list-style: none;
+    margin: 0;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: all 0.2s ease;
+    z-index: 100;
+    border: 1px solid #F4F5F6;
+}
+
+.ex-nav-links li:hover .ex-nav-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.ex-nav-dropdown li a {
+    display: block;
+    padding: 10px 20px;
+    color: #4C586C;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 400;
+    text-transform: none;
+    transition: all 0.15s;
+}
+
+.ex-nav-dropdown li a:hover {
+    color: #EA001E;
+    background: #F4F5F6;
+    padding-left: 24px;
+}
+
+.ex-nav-separator {
+    width: 1px;
+    height: 24px;
+    background: #E0E0E0;
+    margin: 0 10px;
+}
+
+.ex-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.ex-phone {
+    font-size: 14px;
+    font-weight: 700;
+    color: #161829;
+    text-decoration: none;
+}
+
+.ex-currency-select {
+    padding: 6px 12px;
+    border: 1px solid #C9C6C6;
+    border-radius: 4px;
+    font-family: 'Lato', sans-serif;
+    font-size: 13px;
+    color: #4C586C;
+    background: #FFFFFF;
+    cursor: pointer;
+}
+
+/* ============================================================
+   HERO SECTION - Matching Extrarent exactly
+   ============================================================ */
+.ex-hero {
+    position: relative;
+    min-height: 600px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.ex-hero-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.ex-hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #161829;
+    opacity: 0.5;
+}
+
+.ex-hero-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 80px 0;
+    color: #FFFFFF;
+}
+
+.ex-hero-title {
+    font-family: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+    font-weight: 600;
+    font-size: 3.5rem;
+    color: #FFFFFF;
+    margin-bottom: 20px;
+    line-height: 1.2;
+}
+
+.ex-hero-subtitle {
+    font-family: 'Lato', sans-serif;
+    font-weight: 400;
+    font-size: 1.25rem;
+    color: #FFFFFF;
+    margin-bottom: 40px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    opacity: 0.95;
+}
+
+/* ============================================================
+   SECTION SPACING - Matching Elementor padding
+   ============================================================ */
+.ex-section {
+    padding: 80px 0;
+}
+
+.ex-section-sm {
+    padding: 50px 0;
+}
+
+.ex-section-lg {
+    padding: 100px 0;
+}
+
+.ex-section-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.ex-section-title {
+    font-family: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+    font-weight: 600;
+    font-size: 2.5rem;
+    color: #161829;
+    margin-bottom: 15px;
+}
+
+.ex-section-subtitle {
+    font-family: 'Lato', sans-serif;
+    font-weight: 400;
+    font-size: 1.1rem;
+    color: #4C586C;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Accent line */
+.ex-accent-line {
+    width: 60px;
+    height: 4px;
+    background: #EA001E;
+    margin: 15px auto 0;
+    border: none;
+}
+
+.ex-accent-line-left {
+    width: 40px;
+    height: 4px;
+    background: #EA001E;
+    margin: 15px 0 0;
+    border: none;
+}
+
+/* ============================================================
+   CARD STYLES - Elementor hover effects
+   ============================================================ */
+.ex-card {
+    background: #FFFFFF;
+    border-radius: 4px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    border: 1px solid #F4F5F6;
+}
+
+.ex-card:hover {
+    border-radius: 6px;
+    box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.14);
+    transform: translateY(-2px);
+}
+
+.ex-card-image {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    display: block;
+}
+
+.ex-card-body {
+    padding: 20px;
+}
+
+.ex-card-title {
+    font-family: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+    font-weight: 600;
+    font-size: 1.25rem;
+    color: #161829;
+    margin-bottom: 8px;
+}
+
+.ex-card-text {
+    color: #4C586C;
+    font-size: 0.9rem;
+    margin-bottom: 12px;
+}
+
+.ex-card-price {
+    font-family: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+    font-weight: 600;
+    font-size: 1.5rem;
+    color: #EA001E;
+}
+
+.ex-card-price span {
+    font-family: 'Lato', sans-serif;
+    font-weight: 400;
+    font-size: 0.85rem;
+    color: #6E7684;
+}
+
+/* ============================================================
+   ICON BOXES - Elementor style
+   ============================================================ */
+.ex-icon-box {
+    padding: 30px;
+    text-align: center;
+    transition: all 0.3s;
+}
+
+.ex-icon-box:hover {
+    border-radius: 6px;
+    box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.14);
+}
+
+.ex-icon-box-icon {
+    font-size: 42px;
+    color: #EA001E;
+    margin-bottom: 15px;
+}
+
+.ex-icon-box-title {
+    font-family: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+    font-weight: 600;
+    font-size: 1.1rem;
+    line-height: 1.3em;
+    margin-bottom: 7px;
+    color: #161829;
+}
+
+.ex-icon-box-desc {
+    color: #4C586C;
+    font-size: 0.9rem;
+}
+
+/* ============================================================
+   BUTTONS - Extrarent style
+   ============================================================ */
+.ex-btn {
+    display: inline-block;
+    padding: 12px 32px;
+    border-radius: 4px;
+    font-family: 'Lato', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    text-decoration: none;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: none;
+    line-height: 1.4;
+}
+
+.ex-btn-primary {
+    background: #EA001E;
+    color: #FFFFFF;
+}
+
+.ex-btn-primary:hover {
+    background: #c50019;
+    color: #FFFFFF;
+}
+
+.ex-btn-secondary {
+    background: #0056DE;
+    color: #FFFFFF;
+}
+
+.ex-btn-secondary:hover {
+    background: #0044b0;
+    color: #FFFFFF;
+}
+
+.ex-btn-outline {
+    background: transparent;
+    border: 2px solid #EA001E;
+    color: #EA001E;
+}
+
+.ex-btn-outline:hover {
+    background: #EA001E;
+    color: #FFFFFF;
+}
+
+.ex-btn-white {
+    background: #FFFFFF;
+    color: #161829;
+}
+
+.ex-btn-white:hover {
+    background: #F4F5F6;
+    color: #161829;
+}
+
+.ex-btn-sm {
+    padding: 8px 20px;
+    font-size: 13px;
+}
+
+.ex-btn-lg {
+    padding: 16px 40px;
+    font-size: 16px;
+}
+
+/* ============================================================
+   FORM INPUTS - Extrarent style
+   ============================================================ */
+.ex-input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: 'Lato', sans-serif;
+    color: #4C586C;
+    background: #FFFFFF;
+    transition: border-color 0.2s;
+}
+
+.ex-input:focus {
+    outline: none;
+    border-color: #EA001E;
+    box-shadow: 0 0 0 3px rgba(234, 0, 30, 0.1);
+}
+
+.ex-input::placeholder {
+    color: #9ca3af;
+}
+
+.ex-select {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: 'Lato', sans-serif;
+    color: #4C586C;
+    background: #FFFFFF;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+    background-position: right 12px center;
+    background-repeat: no-repeat;
+    background-size: 16px;
+    cursor: pointer;
+}
+
+.ex-select:focus {
+    outline: none;
+    border-color: #EA001E;
+    box-shadow: 0 0 0 3px rgba(234, 0, 30, 0.1);
+}
+
+/* ============================================================
+   SEARCH FORM - Hero search bar
+   ============================================================ */
+.ex-search-bar {
+    background: #FFFFFF;
+    border-radius: 8px;
+    padding: 30px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    margin-top: -50px;
+    position: relative;
+    z-index: 10;
+}
+
+.ex-search-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    align-items: end;
+}
+
+.ex-search-label {
+    display: block;
+    font-family: 'Lato', sans-serif;
+    font-weight: 500;
+    font-size: 13px;
+    color: #161829;
+    margin-bottom: 6px;
+}
+
+/* ============================================================
+   GALLERY - Customer testimonials grid
+   ============================================================ */
+.ex-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+}
+
+.ex-gallery-item {
+    position: relative;
+    overflow: hidden;
+    border-radius: 6px;
+    aspect-ratio: 4/3;
+    cursor: pointer;
+}
+
+.ex-gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.ex-gallery-item:hover img {
+    transform: scale(1.08);
+}
+
+.ex-gallery-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to top, rgba(22, 24, 41, 0.7), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+    display: flex;
+    align-items: flex-end;
+    padding: 15px;
+}
+
+.ex-gallery-item:hover .ex-gallery-overlay {
+    opacity: 1;
+}
+
+/* ============================================================
+   STATS COUNTERS
+   ============================================================ */
+.ex-counter-number {
+    font-family: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+    font-weight: 600;
+    font-size: 3rem;
+    color: #161829;
+}
+
+.ex-counter-title {
+    font-family: 'Lato', sans-serif;
+    font-weight: 400;
+    color: #292D45;
+    font-size: 0.95rem;
+}
+
+/* ============================================================
+   FOOTER - Extrarent style
+   ============================================================ */
+.ex-footer {
+    background: #161829;
+    color: #C9C6C6;
+    padding: 60px 0 0;
+}
+
+.ex-footer h3,
+.ex-footer h4 {
+    color: #FFFFFF;
+    margin-bottom: 20px;
+}
+
+.ex-footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.ex-footer-links li {
+    margin-bottom: 10px;
+}
+
+.ex-footer-links a {
+    color: #C9C6C6;
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.2s;
+}
+
+.ex-footer-links a:hover {
+    color: #FFFFFF;
+}
+
+.ex-footer-bottom {
+    border-top: 1px solid #292D45;
+    padding: 20px 0;
+    margin-top: 40px;
+    text-align: center;
+    font-size: 13px;
+}
+
+/* ============================================================
+   WHATSAPP FLOATING BUTTON
+   ============================================================ */
+.ex-whatsapp {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    background: #25D366;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 999;
+    transition: transform 0.3s;
+    text-decoration: none;
+}
+
+.ex-whatsapp:hover {
+    transform: scale(1.1);
+}
+
+/* ============================================================
+   MOBILE MENU
+   ============================================================ */
+.ex-mobile-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #FFFFFF;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+}
+
+.ex-mobile-menu.active {
+    display: block;
+}
+
+.ex-mobile-menu a {
+    display: block;
+    padding: 12px 0;
+    color: #161829;
+    text-decoration: none;
+    font-family: 'Lato', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    border-bottom: 1px solid #F4F5F6;
+}
+
+.ex-mobile-toggle {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.ex-mobile-toggle span {
+    display: block;
+    width: 25px;
+    height: 3px;
+    background: #161829;
+    margin: 5px 0;
+    transition: 0.3s;
+}
+
+@media (max-width: 1024px) {
+    .ex-mobile-toggle {
+        display: block;
+    }
+
+    .ex-nav-links {
+        display: none;
+    }
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 767px) {
+    h1 { font-size: 2rem; }
+    h2 { font-size: 1.75rem; }
+    h3 { font-size: 1.5rem; }
+
+    .ex-hero { min-height: 400px; }
+    .ex-hero-title { font-size: 2rem; }
+    .ex-hero-subtitle { font-size: 1rem; }
+
+    .ex-section { padding: 50px 0; }
+    .ex-section-title { font-size: 1.75rem; }
+
+    .ex-search-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .ex-gallery {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
