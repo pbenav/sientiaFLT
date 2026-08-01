@@ -1,4 +1,4 @@
-# sientiaERP — ERP de Código Abierto
+# sientiaFLT — Sistema de Gestión de Flota y Reservas de Vehículos
 
 **Sientia Open Source Lab** — Software libre para equipos y empresas.
 
@@ -9,9 +9,9 @@
 
 ---
 
-## 📌 ¿Qué es sientiaERP?
+## 📌 ¿Qué es sientiaFLT?
 
-sientiaERP es un sistema de gestión empresarial completo, moderno y de código abierto, pensado para **autónomos y pequeñas empresas**. Te permite controlar tu facturación, gestionar el almacén, llevar la contabilidad y analizar tu negocio con dashboards e inteligencia de datos.
+sientiaFLT es un sistema completo de **gestión de flota y reservas de vehículos** de código abierto, pensado para empresas de alquiler de vehículos, flotas corporativas y servicios de movilidad. Te permite gestionar vehículos, categorías, reservas, clientes, pagos, facturas, ubicaciones y mucho más desde un panel de administración intuitivo y potente.
 
 Forma parte del ecosistema **Sientia Open Source Lab**, donde desarrollamos herramientas gratuitas para que cualquier persona, equipo o empresa pueda gestionarse mejor. Sin costes de licencia. Sin limitaciones.
 
@@ -22,44 +22,58 @@ Forma parte del ecosistema **Sientia Open Source Lab**, donde desarrollamos herr
 | **sientiaCTH** | Control y registro de la jornada laboral | [cth.sientia.com](https://cth.sientia.com) |
 | **sientiaERP** | ERP empresarial: facturación, almacén, clientes | [erp.sientia.com](https://erp.sientia.com) |
 | **sientiaMTX** | Planificación de recursos basada en matrices | [mtx.sientia.com](https://mtx.sientia.com) |
+| **sientiaFLT** | Gestión de flota y reservas de vehículos | Esta aplicación |
 
 ---
 
 ## ✨ Características
 
-### Facturación y Finanzas
-- Presupuestos y facturas con generación automática de números
+### Gestión de Vehículos
+- Catálogo completo de vehículos con fotos, características y estado
+- Categorías de vehículos con precios diferenciados por período y volumen
+- Períodos de precio (temporada alta/baja) con tarifas dinámicas
+- Descuentos por volumen (más días = mejor precio)
+- Control de estado: disponible, en reserva, en mantenimiento, fuera de servicio
+- Asignación a ubicaciones y seguimiento de ubicación
+
+### Reservas y Reservas
+- Motor de reservas con calendario visual
+- Cálculo automático de precios según categoría, períodos y descuentos por volumen
+- Estados: pendiente, confirmada, activa, completada, cancelada
+- Fechas de recogida y devolución con ubicación
+- Control de conductor (edad, adicionales)
+- Historial completo de reservas
+
+### Gestión de Clientes
+- Perfiles completos con datos de contacto y fiscales
+- Historial de reservas y transacciones
+- Segmentación y búsqueda avanzada
+
+### Pagos y Facturación
 - Gestión de pagos parciales y totales
-- Control de impagados y vencimientos
-- Exportación a PDF
+- Facturación automática con generación de PDF
+- Control de depósitos y garantías
+- Estados de pago: no pagado, parcial, pagado, reembolsado
 - Soporte multi-moneda
 
-### Gestión de Clientes y Proveedores
-- Perfiles completos con datos de contacto y fiscales
-- Historial de interacciones y transacciones
-- Segmentación por etiquetas y categorías
+### Gestión de Reseñas
+- Sistema de valoraciones de clientes
+- Aprobación de reseñas
+- Valoración de estrellas
 
-### Control de Almacén e Inventario
-- Gestión de productos y servicios
-- Control de stock en tiempo real
-- Alertas de stock mínimo
-- Historial de movimientos de inventario
-- Códigos de barras y referencias
-
-### Albaranes y Pedidos
-- Creación de albaranes de entrega
-- Gestión de pedidos a proveedores
-- Conversión de presupuestos en pedidos y facturas
-
-### Inteligencia de Datos
+### Panel de Administración
+- Panel de administración completo con FilamentPHP
 - Dashboard con estadísticas en tiempo real
-- Gráficos de ingresos, gastos y rentabilidad
-- Análisis de productos más vendidos
-- Informes de clientes y proveedores
+- Búsqueda y filtros avanzados
+- Exportación de datos
+- Gestión multi-usuario con roles
 
-### Multi-Empresa
-- Gestión de múltiples empresas desde una misma instancia
-- Datos completamente aislados por empresa
+### Características Técnicas
+- Interfaz moderna y responsive
+- Validación de datos en tiempo real
+- Notificaciones y alertas
+- Soporte para múltiples ubicaciones
+- API REST para integraciones
 
 ---
 
@@ -91,8 +105,8 @@ Forma parte del ecosistema **Sientia Open Source Lab**, donde desarrollamos herr
 ### 1. Clonar el repositorio
 
 ```bash
-git clone https://github.com/pbenav/sientiaERP.git
-cd sientiaERP
+git clone https://github.com/pbenav/sientiaFLT.git
+cd sientiaFLT
 ```
 
 ### 2. Instalar dependencias de PHP
@@ -120,7 +134,7 @@ Edita el archivo `.env` con los datos de tu base de datos y configuración:
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE=sientia_erp
+DB_DATABASE=sientiaflt
 DB_USERNAME=tu_usuario
 DB_PASSWORD=tu_contraseña
 ```
@@ -131,7 +145,10 @@ DB_PASSWORD=tu_contraseña
 php artisan migrate --seed
 ```
 
-Esto creará todas las tablas y poblará datos iniciales de ejemplo, incluyendo un usuario administrador por defecto.
+Esto creará todas las tablas y poblará datos iniciales de ejemplo, incluyendo:
+- Categorías de vehículos con períodos de precio y descuentos por volumen
+- Vehículos de muestra (scooters)
+- Usuario administrador por defecto
 
 ### 6. Crear el enlace de almacenamiento simbólico
 
@@ -149,7 +166,7 @@ La aplicación estará disponible en `http://localhost:8000`
 
 ### 8. Acceder al panel de administración
 
-Ve a `/admin` en tu navegador. Las credenciales por defecto son las que hayas configurado en el seeder.
+Ve a `/admin` en tu navegador. Accede con las credenciales del usuario administrador creado por el seeder.
 
 ---
 
@@ -160,8 +177,8 @@ Ve a `/admin` en tu navegador. Las credenciales por defecto son las que hayas co
 ```nginx
 server {
     listen 80;
-    server_name erp.tudominio.com;
-    root /var/www/sientiaERP/public;
+    server_name flota.tudominio.com;
+    root /var/www/sientiaFLT/public;
     index index.php index.html;
 
     location / {
@@ -185,12 +202,12 @@ server {
 Configura el cron del servidor para ejecutar las tareas programadas de Laravel cada minuto:
 
 ```cron
-* * * * * cd /var/www/sientiaERP && php artisan schedule:run >> /dev/null 2>&1
+* * * * * cd /var/www/sientiaFLT && php artisan schedule:run >> /dev/null 2>&1
 ```
 
 ### Colas de trabajo
 
-Para procesar colas en segundo plano (emails, importaciones, etc.):
+Para procesar colas en segundo plano (emails, notificaciones, etc.):
 
 ```bash
 php artisan queue:work --queue=high,default --tries=3
@@ -203,12 +220,14 @@ O usa el servicio de systemd para mantener el worker activo.
 ## 📂 Estructura del proyecto
 
 ```
-sientiaERP/
+sientiaFLT/
 ├── app/
 │   ├── Filament/          # Panel de administración (Resources, Pages, Widgets)
+│   │   ├── Resources/     # Resources para cada entidad (Vehicles, Bookings, etc.)
+│   │   └── RelationManagers/ # Relaciones entre entidades
 │   ├── Http/              # Controladores, Middlewares, Requests
-│   ├── Models/            # Modelos Eloquent
-│   └── Services/          # Lógica de negocio
+│   ├── Models/            # Modelos Eloquent (Vehicle, Booking, Customer, etc.)
+│   └── Services/          # Lógica de negocio (cálculo de precios, etc.)
 ├── config/                # Archivos de configuración
 ├── database/
 │   ├── migrations/        # Migraciones de base de datos
@@ -218,6 +237,33 @@ sientiaERP/
 ├── routes/                # Definición de rutas
 └── tests/                 # Tests unitarios y funcionales
 ```
+
+---
+
+## 🗄️ Modelo de datos
+
+### Entidades principales
+
+| Entidad | Descripción |
+|---|---|
+| **Vehicle** | Vehículos con categoría, ubicación y estado |
+| **VehicleCategory** | Categorías con precios y descuentos |
+| **PricePeriod** | Períodos de precio (temporada alta/baja) |
+| **CategoryVolumeDiscount** | Descuentos por volumen (días) |
+| **Booking** | Reservas con fechas, estado y precios |
+| **Customer** | Clientes con datos de contacto |
+| **Payment** | Pagos asociados a reservas |
+| **Invoice** | Facturas generadas desde reservas |
+| **Review** | Reseñas y valoraciones |
+| **Location** | Ubicaciones de recogida/devolución |
+
+### Cálculo de precios
+
+El sistema calcula automáticamente el precio de una reserva considerando:
+1. La categoría del vehículo seleccionado
+2. El período de precio que cubre las fechas de la reserva
+3. El descuento por volumen (número de días)
+4. Servicios adicionales solicitados
 
 ---
 
