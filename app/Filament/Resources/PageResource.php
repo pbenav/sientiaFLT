@@ -39,85 +39,84 @@ class PageResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
+            ->columns(3)
             ->schema([
-                Split::make([
-                    Section::make('Contenido de la Página')
-                        ->schema([
-                            TextInput::make('title')
-                                ->required()
-                                ->maxLength(255)
-                                ->live(onBlur: true)
-                                ->afterStateUpdated(fn (string $operation, $state, SetState $set) => $operation === 'create' ? $set('slug', \Str::slug($state)) : null),
+                Section::make('Contenido de la Página')
+                    ->schema([
+                        TextInput::make('title')
+                            ->required()
+                            ->maxLength(255)
+                            ->live(onBlur: true)
+                            ->afterStateUpdated(fn (string $operation, $state, \Filament\Forms\Set $set) => $operation === 'create' ? $set('slug', \Str::slug($state)) : null),
 
-                            TextInput::make('slug')
-                                ->required()
-                                ->maxLength(255)
-                                ->unique(ignoreRecord: true)
-                                ->disabled(fn ($record) => $record !== null)
-                                ->dehydrated(fn ($record) => $record === null),
+                        TextInput::make('slug')
+                            ->required()
+                            ->maxLength(255)
+                            ->unique(ignoreRecord: true)
+                            ->disabled(fn ($record) => $record !== null)
+                            ->dehydrated(fn ($record) => $record === null),
 
-                            Textarea::make('excerpt')
-                                ->maxLength(500)
-                                ->rows(2)
-                                ->placeholder('Breve descripción para SEO y previews'),
+                        Textarea::make('excerpt')
+                            ->maxLength(500)
+                            ->rows(2)
+                            ->placeholder('Breve descripción para SEO y previews'),
 
-                            MarkdownEditor::make('content')
-                                ->required()
-                                ->columnSpan('full')
-                                ->fileAttachmentsDirectory('pages'),
-                        ])
-                        ->columnSpan(2),
+                        MarkdownEditor::make('content')
+                            ->required()
+                            ->columnSpanFull()
+                            ->fileAttachmentsDirectory('pages'),
+                    ])
+                    ->columnSpan(['lg' => 2]),
 
-                    Section::make('Publicación')
-                        ->schema([
-                            ToggleButtons::make('status')
-                                ->required()
-                                ->inline()
-                                ->options([
-                                    'draft' => 'Borrador',
-                                    'published' => 'Publicada',
-                                ])
-                                ->colors([
-                                    'draft' => 'gray',
-                                    'published' => 'success',
-                                ])
-                                ->default('draft'),
+                Section::make('Publicación')
+                    ->schema([
+                        ToggleButtons::make('status')
+                            ->required()
+                            ->inline()
+                            ->options([
+                                'draft' => 'Borrador',
+                                'published' => 'Publicada',
+                            ])
+                            ->colors([
+                                'draft' => 'gray',
+                                'published' => 'success',
+                            ])
+                            ->default('draft'),
 
-                            Toggle::make('published')
-                                ->label('Página publicada')
-                                ->helperText('Las páginas publicadas son accesibles públicamente')
-                                ->default(false),
+                        Toggle::make('published')
+                            ->label('Página publicada')
+                            ->helperText('Las páginas publicadas son accesibles públicamente')
+                            ->default(false),
 
-                            Toggle::make('in_menu')
-                                ->label('Mostrar en menú')
-                                ->default(false),
+                        Toggle::make('in_menu')
+                            ->label('Mostrar en menú')
+                            ->default(false),
 
-                            TextInput::make('menu_order')
-                                ->label('Orden en menú')
-                                ->numeric()
-                                ->default(0)
-                                ->visible(fn ($get) => $get('in_menu')),
+                        TextInput::make('menu_order')
+                            ->label('Orden en menú')
+                            ->numeric()
+                            ->default(0)
+                            ->visible(fn (\Filament\Forms\Get $get) => $get('in_menu')),
 
-                            Select::make('template')
-                                ->label('Plantilla')
-                                ->options([
-                                    'default' => 'Por defecto',
-                                    'fullwidth' => 'Ancho completo',
-                                    'landing' => 'Landing page',
-                                ])
-                                ->default('default'),
+                        Select::make('template')
+                            ->label('Plantilla')
+                            ->options([
+                                'default' => 'Por defecto',
+                                'fullwidth' => 'Ancho completo',
+                                'landing' => 'Landing page',
+                            ])
+                            ->default('default'),
 
-                            Select::make('layout')
-                                ->label('Layout')
-                                ->options([
-                                    'layouts.app' => 'Layout principal',
-                                    'layouts.nofooter' => 'Sin footer',
-                                    'layouts.minimal' => 'Minimal',
-                                ])
-                                ->default('layouts.app'),
-                        ])
-                        ->columnSpan(1),
-                ])->columns(3),
+                        Select::make('layout')
+                            ->label('Layout')
+                            ->options([
+                                'layouts.app' => 'Layout principal',
+                                'layouts.nofooter' => 'Sin footer',
+                                'layouts.minimal' => 'Minimal',
+                            ])
+                            ->default('layouts.app'),
+                    ])
+                    ->columnSpan(['lg' => 1]),
 
                 Section::make('SEO')
                     ->schema([
@@ -132,6 +131,7 @@ class PageResource extends Resource
                             ->rows(3)
                             ->placeholder('Aparecerá en los resultados de búsqueda'),
                     ])
+                    ->columnSpanFull()
                     ->columns(2),
             ]);
     }
@@ -216,4 +216,20 @@ class PageResource extends Resource
             'edit' => Pages\EditPage::route('/{record}/edit'),
         ];
     }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __(static::$navigationGroup);
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __(static::$modelLabel ?? \Illuminate\Support\Str::headline(class_basename(static::$model)));
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __(static::$pluralModelLabel ?? \Illuminate\Support\Str::plural(static::getModelLabel()));
+    }
 }
+

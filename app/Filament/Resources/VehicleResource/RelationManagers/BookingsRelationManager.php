@@ -22,7 +22,8 @@ class BookingsRelationManager extends RelationManager
                     ->required()
                     ->maxLength(50),
                 Forms\Components\Select::make('customer_id')
-                    ->relationship('customer', 'full_name')
+                    ->relationship('customer', 'first_name')
+                    ->getOptionLabelFromRecordUsing(fn ($record) => $record->full_name)
                     ->searchable()
                     ->required(),
                 Forms\Components\DatePicker::make('start_date')
@@ -38,9 +39,10 @@ class BookingsRelationManager extends RelationManager
             ->columns([
                 Tables\Columns\TextColumn::make('booking_number')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('customer.full_name')
+                Tables\Columns\TextColumn::make('customer.first_name')
                     ->label('Customer')
-                    ->searchable(),
+                    ->formatStateUsing(fn ($record) => $record->customer?->full_name)
+                    ->searchable(['first_name', 'last_name']),
                 Tables\Columns\TextColumn::make('start_date')
                     ->date()
                     ->sortable(),

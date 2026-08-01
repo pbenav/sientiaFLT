@@ -16,6 +16,16 @@ class Reports extends Page
 
     protected static ?string $title = 'Reports';
 
+    public static function getNavigationLabel(): string
+    {
+        return __('Reports');
+    }
+
+    public function getTitle(): string|\Illuminate\Contracts\Support\Htmlable
+    {
+        return __('Reports');
+    }
+
     protected static ?int $navigationSort = 1;
 
     protected static string $view = 'filament.pages.reports';

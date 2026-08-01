@@ -4,8 +4,59 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ config('app.name') }} - {{ $pageTitle ?? 'Vehicle Fleet Management' }}</title>
-
+    @php
+        $seo = \App\Models\SeoSetting::find(1);
+        $siteName = $seo?->site_name ?? config('app.name');
+        $defaultTitle = $seo?->meta_title ?? 'Alquiler de Vehículos en Ibiza';
+        $title = isset($pageTitle) ? "{$pageTitle} - {$siteName}" : "{$siteName} - {$defaultTitle}";
+        
+        // Let pages override the description if they want
+        $description = $pageDescription ?? $seo?->meta_description ?? '';
+    @endphp
+    
+    <title>{{ $title }}</title>
+    @if($description)
+    <meta name="description" content="{{ $description }}">
+    @endif
+    
+    @if($seo?->meta_keywords)
+    <meta name="keywords" content="{{ $seo->meta_keywords }}">
+    @endif
+    
+    @if($seo?->og_image)
+    <meta property="og:image" content="{{ asset('storage/' . $seo->og_image) }}">
+    <meta property="og:title" content="{{ $title }}">
+    <meta property="og:description" content="{{ $description }}">
+    @endif
+    
+    <!-- Analytics -->
+    @if($seo?->google_analytics_id)
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ $seo->google_analytics_id }}"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', '{{ $seo->google_analytics_id }}');
+    </script>
+    @endif
+    
+    @if($seo?->facebook_pixel_id)
+    <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '{{ $seo->facebook_pixel_id }}');
+    fbq('track', 'PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none"
+    src="https://www.facebook.com/tr?id={{ $seo->facebook_pixel_id }}&ev=PageView&noscript=1"
+    /></noscript>
+    @endif
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <!-- Google Fonts -->

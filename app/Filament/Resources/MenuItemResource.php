@@ -95,6 +95,7 @@ class MenuItemResource extends Resource
 
                 TextColumn::make('type')
                     ->badge()
+                    ->formatStateUsing(fn ($state) => __($state))
                     ->colors([
                         'primary' => 'page',
                         'warning' => 'custom',
@@ -140,4 +141,20 @@ class MenuItemResource extends Resource
             'edit' => Pages\EditMenuItem::route('/{record}/edit'),
         ];
     }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __(static::$navigationGroup);
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __(static::$modelLabel ?? \Illuminate\Support\Str::headline(class_basename(static::$model)));
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __(static::$pluralModelLabel ?? \Illuminate\Support\Str::plural(static::getModelLabel()));
+    }
 }
+

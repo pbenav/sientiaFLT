@@ -39,7 +39,7 @@ class BookingResource extends Resource
                             ->disabled(),
                         Forms\Components\Select::make('customer_id')
                             ->label('Customer')
-                            ->options(Customer::orderBy('first_name')->pluck('full_name', 'id'))
+                            ->options(Customer::orderBy('first_name')->get()->pluck('full_name', 'id'))
                             ->searchable()
                             ->required()
                             ->reactive(),
@@ -130,9 +130,10 @@ class BookingResource extends Resource
                     ->sortable()
                     ->copyable()
                     ->copyable(fn ($state) => (bool) $state),
-                Tables\Columns\TextColumn::make('customer.full_name')
+                Tables\Columns\TextColumn::make('customer.first_name')
                     ->label('Customer')
-                    ->searchable()
+                    ->formatStateUsing(fn ($record) => $record->customer?->full_name)
+                    ->searchable(['first_name', 'last_name'])
                     ->sortable(),
                 Tables\Columns\TextColumn::make('vehicle.name')
                     ->label('Vehicle')
@@ -188,7 +189,7 @@ class BookingResource extends Resource
                         'refunded' => 'Refunded',
                     ]),
                 Tables\Filters\SelectFilter::make('customer_id')
-                    ->relationship('customer', 'full_name')
+                    ->relationship('customer', 'first_name')
                     ->searchable(),
                 Tables\Filters\SelectFilter::make('vehicle_id')
                     ->relationship('vehicle', 'name')
@@ -205,29 +206,27 @@ class BookingResource extends Resource
                     ->label('Booking To'),
             ])
             ->actions([
-                ActionGroup::make([
+                Tables\Actions\ActionGroup::make([
                     Tables\Actions\EditAction::make(),
                     Tables\Actions\ViewAction::make(),
                     Tables\Actions\DeleteAction::make(),
                 ]),
-                Tables\Actions\BulkAction::make('confirmBooking')
-                    ->label('Confirm Selected')
-                    ->visible(fn ($table) => $table->getSelectedRecords()->where('status', 'pending')->count() > 0)
-                    ->action(fn ($records) => $records->where('status', 'pending')->update(['status' => 'confirmed']))
-                    ->icon('heroicon-o-check-circle')
-                    ->requiresConfirmation(),
-                Tables\Actions\BulkAction::make('cancelBooking')
-                    ->label('Cancel Selected')
-                    ->visible(fn ($table) => $table->getSelectedRecords()->whereNotIn('status', ['completed', 'cancelled'])->count() > 0)
-                    ->action(fn ($records) => $records->whereNotIn('status', ['completed', 'cancelled'])->update(['status' => 'cancelled']))
-                    ->icon('heroicon-o-x-circle')
-                    ->requiresConfirmation()
-                    ->modalHeading('Cancel Bookings')
-                    ->modalDescription('Are you sure you want to cancel the selected bookings? This action cannot be undone.'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\BulkAction::make('confirmBooking')
+                        ->label('Confirm Selected')
+                        ->action(fn ($records) => $records->where('status', 'pending')->each->update(['status' => 'confirmed']))
+                        ->icon('heroicon-o-check-circle')
+                        ->requiresConfirmation(),
+                    Tables\Actions\BulkAction::make('cancelBooking')
+                        ->label('Cancel Selected')
+                        ->action(fn ($records) => $records->whereNotIn('status', ['completed', 'cancelled'])->each->update(['status' => 'cancelled']))
+                        ->icon('heroicon-o-x-circle')
+                        ->requiresConfirmation()
+                        ->modalHeading('Cancel Bookings')
+                        ->modalDescription('Are you sure you want to cancel the selected bookings? This action cannot be undone.'),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
@@ -250,4 +249,20 @@ class BookingResource extends Resource
             'edit' => Pages\EditBooking::route('/{record}/edit'),
         ];
     }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __(static::$navigationGroup);
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __(static::$modelLabel ?? \Illuminate\Support\Str::headline(class_basename(static::$model)));
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __(static::$pluralModelLabel ?? \Illuminate\Support\Str::plural(static::getModelLabel()));
+    }
 }
+

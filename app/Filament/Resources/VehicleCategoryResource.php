@@ -56,7 +56,35 @@ class VehicleCategoryResource extends Resource
                             ->relationship('pricePeriods', 'name')
                             ->multiple()
                             ->label('Períodos de Precio')
-                            ->help('Asigna períodos de precio a esta categoría. Los vehículos de esta categoría heredarán estos precios.'),
+                            ->helperText('Asigna períodos de precio a esta categoría. Los vehículos de esta categoría heredarán estos precios.')
+                            ->createOptionForm([
+                                Forms\Components\TextInput::make('name')
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->placeholder('Ej: Bajo (Enero-Mayo)')
+                                    ->columnSpanFull(),
+                                Forms\Components\Fieldset::make('Fechas')
+                                    ->schema([
+                                        Forms\Components\DatePicker::make('start_date')
+                                            ->label('Fecha de inicio')
+                                            ->required()
+                                            ->native(false),
+                                        Forms\Components\DatePicker::make('end_date')
+                                            ->label('Fecha de fin')
+                                            ->required()
+                                            ->native(false),
+                                    ]),
+                                Forms\Components\TextInput::make('base_price')
+                                    ->label('Precio base por día (€)')
+                                    ->required()
+                                    ->numeric()
+                                    ->prefix('€')
+                                    ->default(0)
+                                    ->step(0.01),
+                                Forms\Components\Toggle::make('active')
+                                    ->label('Activo')
+                                    ->default(true),
+                            ]),
                     ]),
 
                 Forms\Components\Section::make('Descuentos por Volumen')
@@ -167,4 +195,20 @@ class VehicleCategoryResource extends Resource
             'edit' => Pages\EditVehicleCategory::route('/{record}/edit'),
         ];
     }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __(static::$navigationGroup);
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __(static::$modelLabel ?? \Illuminate\Support\Str::headline(class_basename(static::$model)));
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __(static::$pluralModelLabel ?? \Illuminate\Support\Str::plural(static::getModelLabel()));
+    }
 }
+

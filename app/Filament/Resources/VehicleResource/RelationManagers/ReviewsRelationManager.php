@@ -36,9 +36,10 @@ class ReviewsRelationManager extends RelationManager
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('customer.full_name')
+                Tables\Columns\TextColumn::make('customer.first_name')
                     ->label('Customer')
-                    ->searchable(),
+                    ->formatStateUsing(fn ($record) => $record->customer?->full_name)
+                    ->searchable(['first_name', 'last_name']),
                 Tables\Columns\TextColumn::make('rating')
                     ->badge()
                     ->formatStateUsing(fn ($state) => str_repeat('⭐', $state))

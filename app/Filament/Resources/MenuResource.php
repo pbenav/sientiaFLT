@@ -92,4 +92,20 @@ class MenuResource extends Resource
             'edit' => Pages\EditMenu::route('/{record}/edit'),
         ];
     }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __(static::$navigationGroup);
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __(static::$modelLabel ?? \Illuminate\Support\Str::headline(class_basename(static::$model)));
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __(static::$pluralModelLabel ?? \Illuminate\Support\Str::plural(static::getModelLabel()));
+    }
 }
+
