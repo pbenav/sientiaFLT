@@ -1,59 +1,284 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# sientiaERP — ERP de Código Abierto
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+**Sientia Open Source Lab** — Software libre para equipos y empresas.
 
-## About Laravel
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
+[![PHP 8.4+](https://img.shields.io/badge/PHP-8.4+-777BB4)](https://www.php.net/)
+[![Laravel 12](https://img.shields.io/badge/Laravel-12-FF2D20)](https://laravel.com/)
+[![FilamentPHP](https://img.shields.io/badge/FilamentPHP-3-FFB200)](https://filamentphp.com/)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 📌 ¿Qué es sientiaERP?
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+sientiaERP es un sistema de gestión empresarial completo, moderno y de código abierto, pensado para **autónomos y pequeñas empresas**. Te permite controlar tu facturación, gestionar el almacén, llevar la contabilidad y analizar tu negocio con dashboards e inteligencia de datos.
 
-## Learning Laravel
+Forma parte del ecosistema **Sientia Open Source Lab**, donde desarrollamos herramientas gratuitas para que cualquier persona, equipo o empresa pueda gestionarse mejor. Sin costes de licencia. Sin limitaciones.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+### 🧩 Ecosistema Sientia
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+| Aplicación | Descripción | Demo |
+|---|---|---|
+| **sientiaCTH** | Control y registro de la jornada laboral | [cth.sientia.com](https://cth.sientia.com) |
+| **sientiaERP** | ERP empresarial: facturación, almacén, clientes | [erp.sientia.com](https://erp.sientia.com) |
+| **sientiaMTX** | Planificación de recursos basada en matrices | [mtx.sientia.com](https://mtx.sientia.com) |
 
-## Laravel Sponsors
+---
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## ✨ Características
 
-### Premium Partners
+### Facturación y Finanzas
+- Presupuestos y facturas con generación automática de números
+- Gestión de pagos parciales y totales
+- Control de impagados y vencimientos
+- Exportación a PDF
+- Soporte multi-moneda
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### Gestión de Clientes y Proveedores
+- Perfiles completos con datos de contacto y fiscales
+- Historial de interacciones y transacciones
+- Segmentación por etiquetas y categorías
 
-## Contributing
+### Control de Almacén e Inventario
+- Gestión de productos y servicios
+- Control de stock en tiempo real
+- Alertas de stock mínimo
+- Historial de movimientos de inventario
+- Códigos de barras y referencias
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Albaranes y Pedidos
+- Creación de albaranes de entrega
+- Gestión de pedidos a proveedores
+- Conversión de presupuestos en pedidos y facturas
 
-## Code of Conduct
+### Inteligencia de Datos
+- Dashboard con estadísticas en tiempo real
+- Gráficos de ingresos, gastos y rentabilidad
+- Análisis de productos más vendidos
+- Informes de clientes y proveedores
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Multi-Empresa
+- Gestión de múltiples empresas desde una misma instancia
+- Datos completamente aislados por empresa
 
-## Security Vulnerabilities
+---
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## 🏗️ Arquitectura
 
-## License
+| Capa | Tecnología |
+|---|---|
+| **Backend** | Laravel 12 (PHP 8.4+) |
+| **Frontend** | Livewire 3 + Alpine.js |
+| **Admin Panel** | FilamentPHP 3 |
+| **Estilos** | TailwindCSS |
+| **Base de datos** | MySQL / MariaDB |
+| **Autenticación** | Laravel Breeze |
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+---
+
+## 📦 Requisitos del sistema
+
+- **PHP** 8.4 o superior
+- **MySQL** 8.0+ o MariaDB 10.6+
+- **Composer** 2.7+
+- **Node.js** 20+ (con npm o yarn)
+- **Servidor web** Nginx o Apache con soporte de reescritura
+
+---
+
+## 🚀 Instalación
+
+### 1. Clonar el repositorio
+
+```bash
+git clone https://github.com/pbenav/sientiaERP.git
+cd sientiaERP
+```
+
+### 2. Instalar dependencias de PHP
+
+```bash
+composer install
+```
+
+### 3. Instalar dependencias de Node.js y compilar assets
+
+```bash
+npm install && npm run build
+```
+
+### 4. Configurar el entorno
+
+```bash
+cp .env.example .env
+php artisan key:generate
+```
+
+Edita el archivo `.env` con los datos de tu base de datos y configuración:
+
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=sientia_erp
+DB_USERNAME=tu_usuario
+DB_PASSWORD=tu_contraseña
+```
+
+### 5. Ejecutar migraciones y seeders
+
+```bash
+php artisan migrate --seed
+```
+
+Esto creará todas las tablas y poblará datos iniciales de ejemplo, incluyendo un usuario administrador por defecto.
+
+### 6. Crear el enlace de almacenamiento simbólico
+
+```bash
+php artisan storage:link
+```
+
+### 7. Iniciar el servidor de desarrollo
+
+```bash
+php artisan serve
+```
+
+La aplicación estará disponible en `http://localhost:8000`
+
+### 8. Acceder al panel de administración
+
+Ve a `/admin` en tu navegador. Las credenciales por defecto son las que hayas configurado en el seeder.
+
+---
+
+## 🔧 Configuración avanzada
+
+### Producción con Nginx
+
+```nginx
+server {
+    listen 80;
+    server_name erp.tudominio.com;
+    root /var/www/sientiaERP/public;
+    index index.php index.html;
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    location ~ \.php$ {
+        fastcgi_pass unix:/var/run/php/php8.4-fpm.sock;
+        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+
+    location ~ /\.ht {
+        deny all;
+    }
+}
+```
+
+### Tareas programadas (Cron)
+
+Configura el cron del servidor para ejecutar las tareas programadas de Laravel cada minuto:
+
+```cron
+* * * * * cd /var/www/sientiaERP && php artisan schedule:run >> /dev/null 2>&1
+```
+
+### Colas de trabajo
+
+Para procesar colas en segundo plano (emails, importaciones, etc.):
+
+```bash
+php artisan queue:work --queue=high,default --tries=3
+```
+
+O usa el servicio de systemd para mantener el worker activo.
+
+---
+
+## 📂 Estructura del proyecto
+
+```
+sientiaERP/
+├── app/
+│   ├── Filament/          # Panel de administración (Resources, Pages, Widgets)
+│   ├── Http/              # Controladores, Middlewares, Requests
+│   ├── Models/            # Modelos Eloquent
+│   └── Services/          # Lógica de negocio
+├── config/                # Archivos de configuración
+├── database/
+│   ├── migrations/        # Migraciones de base de datos
+│   └── seeders/           # Seeders para datos iniciales
+├── public/                # Document root (assets, index.php)
+├── resources/             # Vistas Blade y componentes
+├── routes/                # Definición de rutas
+└── tests/                 # Tests unitarios y funcionales
+```
+
+---
+
+## 🌐 Licencia
+
+Este proyecto se distribuye bajo la **[Licencia GNU AGPL v3](https://www.gnu.org/licenses/agpl-3.0)**.
+
+### Tus derechos
+
+- ✅ **Usar** el software de forma gratuita para cualquier propósito
+- ✅ **Estudiar** cómo funciona (el código fuente está disponible)
+- ✅ **Modificar** el código para adaptarlo a tus necesidades
+- ✅ **Compartir** copias del software original o modificado
+- ✅ **Distribuir** versiones modificadas
+
+### Tus responsabilidades
+
+- 📋 Si modificas el software y lo pones a disposición de otros (incluso como servicio web), debes poner el código fuente de tus cambios a disposición bajo la misma licencia AGPL v3.
+- 📋 Debes incluir un aviso con la licencia y el copyright original.
+- 📋 El software se proporciona "tal cual", sin garantía de ningún tipo.
+
+Texto completo de la licencia: [GNU AGPL v3](https://www.gnu.org/licenses/agpl-3.0.html)
+
+---
+
+## 🤝 Sobre Sientia Open Source Lab
+
+Somos un laboratorio de desarrollo de software libre, de código abierto y totalmente gratuito. Creemos que el conocimiento y las herramientas deben ser accesibles para todos.
+
+### Nuestra filosofía
+
+| | |
+|---|---|
+| 🔓 **Open Source Total** | Todo nuestro código es público y libre. Puedes estudiar cómo funciona, modificarlo, adaptarlo a tus necesidades y contribuir a mejorarlo. Sin letra pequeña. |
+| 🎁 **Siempre Gratuito** | Nuestras aplicaciones son y seguirán siendo gratis. No hay planes de pago, ni funciones premium ocultas. Lo que ves es lo que hay, para todos por igual. |
+| ❤ **Comunidad y Apoyo** | Nos financiamos gracias a personas como tú que valoran el software libre. Tu apoyo en Patreon o Buy Me a Coffee nos ayuda a seguir adelante. |
+
+### Contacto
+
+- 📧 Email: [hola@sientia.com](mailto:hola@sientia.com)
+- 🌐 Web: [https://sientia.com](https://sientia.com)
+- 👤 El Autor: [https://cv.sientia.com](https://cv.sientia.com)
+- 🐙 GitHub: [https://github.com/pbenav](https://github.com/pbenav)
+- 🦊 GitLab: [https://gitlab.com/pbenav](https://gitlab.com/pbenav)
+
+### Apoyar el proyecto
+
+El software libre no es gratis de mantener. Si usas nuestras herramientas y quieres que sigan creciendo:
+
+- ❤ [Apoyar en Patreon](https://www.patreon.com/cw/sientia)
+- ☕ [Buy Me a Coffee](https://buymeacoffee.com/sientia)
+
+---
+
+## 🙏 Agradecimientos
+
+- [Laravel](https://laravel.com/) - El framework PHP para artesanos
+- [FilamentPHP](https://filamentphp.com/) - Panel de administración para Laravel
+- [TailwindCSS](https://tailwindcss.com/) - Framework CSS utility-first
+- [MySQL](https://www.mysql.com/) - Sistema de gestión de bases de datos relacional
+
+---
+
+© 2026 [Sientia Open Source Lab](https://sientia.com) | Licencia [AGPL v3](https://www.gnu.org/licenses/agpl-3.0)
