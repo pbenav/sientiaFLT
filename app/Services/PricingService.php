@@ -21,8 +21,17 @@ class PricingService
 
         $basePrice = $this->calculateBasePrice($vehicle, $rules, $start, $end, $days);
         $discount = $this->calculateDiscount($rules, $basePrice);
+        
+        // Apply volume discount from category
+        $volumeDiscountPercent = $this->getVolumeDiscountPercentage($vehicle, $days);
+        if ($volumeDiscountPercent > 0) {
+            $discount += $basePrice * ($volumeDiscountPercent / 100);
+        }
+        
         $subtotal = $basePrice - $discount;
-        $taxRate = config('extrarent.tax_rate', 21);
+        $defaultTax = \App\Models\Tax::where('is_default', true)->where('is_active', true)->first();
+        $taxRate = $defaultTax ? (float) $defaultTax->rate : config('extrarent.tax_rate', 21);
+        $taxName = $defaultTax ? $defaultTax->name : 'IVA (' . $taxRate . '%)';
         $taxAmount = $subtotal * ($taxRate / 100);
         $extraPrice = $this->calculateExtras($extras, $days);
         $total = $subtotal + $taxAmount + $extraPrice;
@@ -32,6 +41,7 @@ class PricingService
             'discount' => round($discount, 2),
             'subtotal' => round($subtotal, 2),
             'tax_rate' => $taxRate,
+            'tax_name' => $taxName,
             'tax_amount' => round($taxAmount, 2),
             'extras_total' => round($extraPrice, 2),
             'total' => round($total, 2),
@@ -130,6 +140,20 @@ class PricingService
         }
 
         return min($totalDiscount, $basePrice);
+    }
+
+    /**
+     * Get the volume discount percentage for a vehicle based on its category and number of days.
+     */
+    public function getVolumeDiscountPercentage(Vehicle $vehicle, int $days): float
+    {
+        $category = $vehicle->category;
+
+        if (!$category) {
+            return 0;
+        }
+
+        return $category->getDiscountForDays($days);
     }
 
     protected function calculateExtras($extras, int $days): float

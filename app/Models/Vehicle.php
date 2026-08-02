@@ -90,6 +90,11 @@ class Vehicle extends Model
         return $this->hasMany(VehicleImage::class);
     }
 
+    public function primaryImage(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(VehicleImage::class)->orderBy('sort_order');
+    }
+
     public function category(): BelongsTo
     {
         return $this->belongsTo(VehicleCategory::class, 'category_id');
@@ -194,28 +199,17 @@ class Vehicle extends Model
 
     /**
      * Calculate the final price for a given number of days starting from a specific date.
-     * Formula: (base_price * days) * (1 - discount_percent / 100)
+     * Delegates to PricingService for consistent calculations.
      */
     public function calculatePrice(int $days, \DateTimeInterface $startDate = null): float
     {
-        $category = $this->category;
+        $pricingService = app(\App\Services\PricingService::class);
+        $start = $startDate ?? now();
+        $end = (clone $start)->addDays($days);
 
-        if (! $category) {
-            return $this->daily_rate ?? 0;
-        }
+        $result = $pricingService->calculatePrice($this, $start, $end);
 
-        $date = $startDate ?? now();
-        $basePrice = $category->getBasePriceForDate($date);
-
-        if (! $basePrice) {
-            return $this->daily_rate ?? 0;
-        }
-
-        $subtotal = $basePrice * $days;
-
-        $discount = $category->getDiscountForDays($days);
-
-        return $subtotal * (1 - $discount / 100);
+        return (float) $result['total'];
     }
 
     /**
