@@ -180,4 +180,36 @@ class PricingService implements \App\Interfaces\PricingServiceInterface
 
         return $total;
     }
+
+    /**
+     * Get available vehicles matching search criteria.
+     * Delegates to AvailabilityService for search logic.
+     */
+    public function searchVehicles(
+        ?int $categoryId = null,
+        ?string $type = null,
+        ?string $fuelType = null,
+        ?string $transmission = null,
+        ?int $minSeats = null,
+        ?float $minPrice = null,
+        ?float $maxPrice = null,
+        ?string $search = null,
+        ?\DateTimeInterface $startDate = null,
+        ?\DateTimeInterface $endDate = null,
+        ?int $locationId = null
+    ): \Illuminate\Database\Eloquent\Collection {
+        return app(AvailabilityService::class)->getAvailableVehicles(
+            categoryId: $categoryId,
+            type: $type,
+            fuelType: $fuelType,
+            transmission: $transmission,
+            minSeats: $minSeats,
+            minPrice: $minPrice,
+            maxPrice: $maxPrice,
+            search: $search,
+            startDate: $startDate,
+            endDate: $endDate,
+            locationId: $locationId,
+        );
+    }
 }

@@ -20,7 +20,7 @@ class Booking extends Model
         'has_additional_driver', 'status', 'payment_status',
         'subtotal', 'tax_amount', 'total_amount', 'amount_paid',
         'amount_due', 'currency_code', 'deposit_amount',
-        'special_requests', 'customer_notes', 'internal_notes',
+        'special_requests', 'customer_notes', 'internal_notes', 'notes',
         'booking_source', 'utm_source', 'utm_medium', 'utm_campaign',
         'referral_code', 'is_confirmed', 'is_paid', 'is_active',
         'erp_sync_status', 'erp_sync_data',

@@ -2,6 +2,14 @@
 
 namespace App\Providers;
 
+use App\Interfaces\AvailabilityServiceInterface;
+use App\Interfaces\BookingServiceInterface;
+use App\Interfaces\ErpClientInterface;
+use App\Interfaces\PricingServiceInterface;
+use App\Services\AvailabilityService;
+use App\Services\BookingService;
+use App\Services\ErpSyncService;
+use App\Services\PricingService;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
 
@@ -9,6 +17,10 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        $this->app->bind(PricingServiceInterface::class, PricingService::class);
+        $this->app->bind(BookingServiceInterface::class, BookingService::class);
+        $this->app->bind(AvailabilityServiceInterface::class, AvailabilityService::class);
+        $this->app->bind(ErpClientInterface::class, ErpSyncService::class);
     }
 
     public function boot(): void
