@@ -6,7 +6,7 @@ use App\Filament\Resources\BookingResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
-class EditBooking extends EditRecord
+class EditBooking extends \App\Filament\Resources\Pages\BaseEditRecord
 {
     protected static string $resource = BookingResource::class;
 
@@ -16,4 +16,5 @@ class EditBooking extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
-}
+
+    }

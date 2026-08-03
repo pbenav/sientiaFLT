@@ -5,8 +5,6 @@ namespace App\Services;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use App\Models\ErpSyncLog;
-use App\Models\Customer;
-use App\Models\Booking;
 
 class SientiaErpClient
 {
@@ -168,62 +166,4 @@ class SientiaErpClient
         return $this->get('stock/' . $productId);
     }
 
-    // Sync methods
-    public function syncCustomer(Customer $customer): array
-    {
-        if ($customer->erp_tercio_id) {
-            return $this->updateTercero($customer->erp_tercio_id, [
-                'nombre' => $customer->first_name . ' ' . $customer->last_name,
-                'email' => $customer->email,
-                'telefono' => $customer->phone,
-                'direccion' => $customer->address,
-                'ciudad' => $customer->city,
-                'provincia' => $customer->province,
-                'codigo_postal' => $customer->postal_code,
-                'pais' => $customer->country,
-                'nif_cif' => $customer->nif_cif,
-                'razon_social' => $customer->company_name,
-            ]);
-        }
-
-        $response = $this->createTercero([
-            'nombre' => $customer->first_name . ' ' . $customer->last_name,
-            'email' => $customer->email,
-            'telefono' => $customer->phone,
-            'direccion' => $customer->address,
-            'ciudad' => $customer->city,
-            'provincia' => $customer->province,
-            'codigo_postal' => $customer->postal_code,
-            'pais' => $customer->country,
-            'nif_cif' => $customer->nif_cif,
-            'razon_social' => $customer->company_name,
-        ]);
-
-        if (isset($response['id'])) {
-            $customer->update(['erp_tercio_id' => $response['id'], 'erp_sync_status' => 'synced']);
-        }
-
-        return $response;
-    }
-
-    public function syncBooking(Booking $booking): array
-    {
-        if ($booking->erp_documento_id) {
-            return $this->updateDocumento($booking->erp_documento_id, [
-                'cliente_id' => $booking->customer->erp_tercio_id,
-                'fecha_inicio' => $booking->start_date->format('Y-m-d H:i:s'),
-                'fecha_fin' => $booking->end_date->format('Y-m-d H:i:s'),
-                'total' => $booking->total_amount,
-                'estado' => $booking->status,
-            ]);
-        }
-
-        return $this->createDocumento([
-            'cliente_id' => $booking->customer->erp_tercio_id,
-            'fecha_inicio' => $booking->start_date->format('Y-m-d H:i:s'),
-            'fecha_fin' => $booking->end_date->format('Y-m-d H:i:s'),
-            'total' => $booking->total_amount,
-            'estado' => $booking->status,
-        ]);
-    }
 }

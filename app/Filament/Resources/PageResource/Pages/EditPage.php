@@ -6,7 +6,7 @@ use App\Filament\Resources\PageResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
-class EditPage extends EditRecord
+class EditPage extends \App\Filament\Resources\Pages\BaseEditRecord
 {
     protected static string $resource = PageResource::class;
 

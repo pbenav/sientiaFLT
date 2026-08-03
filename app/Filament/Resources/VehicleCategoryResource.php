@@ -50,18 +50,27 @@ class VehicleCategoryResource extends Resource
                     ])
                     ->columns(2),
 
-                Forms\Components\Section::make('Períodos de Precio')
+                Forms\Components\Section::make('Precios y Descuentos Globales')
                     ->schema([
+                        Forms\Components\TextInput::make('base_price')
+                            ->label('Precio Base por Defecto')
+                            ->required()
+                            ->numeric()
+                            ->prefix('€')
+                            ->default(50.00)
+                            ->step(0.01)
+                            ->helperText('Precio si no hay un período específico.'),
+                            
                         Forms\Components\Select::make('price_period_ids')
                             ->relationship('pricePeriods', 'name')
                             ->multiple()
                             ->label('Períodos de Precio')
-                            ->helperText('Asigna períodos de precio a esta categoría. Los vehículos de esta categoría heredarán estos precios.')
+                            ->helperText('Asigna períodos de precio a esta categoría. Los vehículos heredarán estos precios si no tienen sobreescrituras (daily_rate).')
                             ->createOptionForm([
                                 Forms\Components\TextInput::make('name')
                                     ->required()
                                     ->maxLength(255)
-                                    ->placeholder('Ej: Bajo (Enero-Mayo)')
+                                    ->placeholder('Ej: Temporada Alta (Julio-Agosto)')
                                     ->columnSpanFull(),
                                 Forms\Components\Fieldset::make('Fechas')
                                     ->schema([
@@ -85,12 +94,10 @@ class VehicleCategoryResource extends Resource
                                     ->label('Activo')
                                     ->default(true),
                             ]),
-                    ]),
 
-                Forms\Components\Section::make('Descuentos por Volumen')
-                    ->schema([
                         Forms\Components\Repeater::make('volume_discounts')
                             ->relationship('volumeDiscounts')
+                            ->label('Descuentos por Volumen (Días)')
                             ->schema([
                                 Forms\Components\TextInput::make('min_days')
                                     ->label('Mínimo días')
@@ -115,6 +122,8 @@ class VehicleCategoryResource extends Resource
                             ->reorderable('sort_order')
                             ->itemLabel(fn (array $state): ?string => $state['min_days'] ? "{$state['min_days']}+ días" : null),
                     ]),
+
+
             ]);
     }
 
@@ -127,8 +136,10 @@ class VehicleCategoryResource extends Resource
                     ->sortable()
                     ->weight('font-medium'),
 
-                Tables\Columns\TextColumn::make('slug')
-                    ->searchable(),
+                Tables\Columns\TextColumn::make('base_price')
+                    ->label('Precio Base')
+                    ->money('EUR')
+                    ->sortable(),
 
                 Tables\Columns\TextColumn::make('price_periods_count')
                     ->label('Períodos')
@@ -139,6 +150,8 @@ class VehicleCategoryResource extends Resource
                     ->label('Descuentos')
                     ->counts('volumeDiscounts')
                     ->sortable(),
+
+
 
                 Tables\Columns\TextColumn::make('vehicles_count')
                     ->label('Vehículos')

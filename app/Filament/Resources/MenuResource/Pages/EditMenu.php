@@ -6,7 +6,7 @@ use App\Filament\Resources\MenuResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
-class EditMenu extends EditRecord
+class EditMenu extends \App\Filament\Resources\Pages\BaseEditRecord
 {
     protected static string $resource = MenuResource::class;
 

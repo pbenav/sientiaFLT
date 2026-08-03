@@ -6,7 +6,8 @@ use App\Filament\Resources\VehicleCategoryResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 
-class CreateVehicleCategory extends CreateRecord
+class CreateVehicleCategory extends \App\Filament\Resources\Pages\BaseCreateRecord
 {
     protected static string $resource = VehicleCategoryResource::class;
-}
+
+    }

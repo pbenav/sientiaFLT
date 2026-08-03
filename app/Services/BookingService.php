@@ -10,13 +10,15 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
-class BookingService
+class BookingService implements \App\Interfaces\BookingServiceInterface
 {
     protected PricingService $pricingService;
+    protected BookingStatusService $statusService;
 
-    public function __construct(PricingService $pricingService)
+    public function __construct(PricingService $pricingService, BookingStatusService $statusService)
     {
         $this->pricingService = $pricingService;
+        $this->statusService = $statusService;
     }
 
     public function createBooking(array $data): Booking
@@ -38,7 +40,7 @@ class BookingService
                 $data['extras'] ?? []
             );
 
-            $bookingNumber = 'BK-' . date('Ymd') . '-' . str_pad(Booking::whereDate('created_at', today())->count() + 1, 4, '0', STR_PAD_LEFT);
+            $bookingNumber = \App\Services\BookingNumberGenerator::generate();
 
             $booking = Booking::create([
                 'customer_id' => $data['customer_id'],
@@ -84,28 +86,22 @@ class BookingService
 
     public function isVehicleAvailable(Vehicle $vehicle, Carbon $startDate, Carbon $endDate): bool
     {
-        $overlapping = Booking::where('vehicle_id', $vehicle->id)
-            ->whereIn('status', ['pending', 'confirmed', 'active'])
-            ->where(function ($query) use ($startDate, $endDate) {
-                $query->whereBetween('start_date', [$startDate, $endDate])
-                      ->orWhereBetween('end_date', [$startDate, $endDate])
-                      ->orWhere(function ($q) use ($startDate, $endDate) {
-                          $q->where('start_date', '<=', $startDate)
-                            ->where('end_date', '>=', $endDate);
-                      });
-            })
-            ->exists();
-
-        return !$overlapping;
+        return app(\App\Services\AvailabilityService::class)
+            ->isVehicleAvailable($vehicle, $startDate, $endDate);
     }
 
     public function confirmBooking(Booking $booking): Booking
     {
-        return $booking->update(['status' => 'confirmed', 'is_confirmed' => true]);
+        return $this->statusService->confirm($booking);
     }
 
     public function cancelBooking(Booking $booking): Booking
     {
-        return $booking->update(['status' => 'cancelled']);
+        return $this->statusService->cancel($booking);
+    }
+
+    public function completeBooking(Booking $booking): Booking
+    {
+        return $this->statusService->complete($booking);
     }
 }

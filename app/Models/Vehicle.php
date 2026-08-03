@@ -174,9 +174,25 @@ class Vehicle extends Model
         });
     }
 
+    /**
+     * Check if this vehicle is available between two dates.
+     */
+    public function isAvailableBetween(\DateTimeInterface $startDate, \DateTimeInterface $endDate): bool
+    {
+        return app(\App\Services\AvailabilityService::class)
+            ->isVehicleAvailable($this, $startDate, $endDate);
+    }
+
     public function getPrimaryImageAttribute(): ?VehicleImage
     {
         return $this->images()->orderBy('sort_order')->first();
+    }
+
+
+
+    public function getStatusColorAttribute(): string
+    {
+        return $this->is_active ? 'success' : 'danger';
     }
 
     public function getFormattedPowerAttribute(): string
@@ -212,17 +228,4 @@ class Vehicle extends Model
         return (float) $result['total'];
     }
 
-    /**
-     * Get the current base price per day based on the active price period for the category.
-     */
-    public function getCurrentBasePrice(): float
-    {
-        $category = $this->category;
-
-        if (! $category) {
-            return (float) ($this->daily_rate ?? 0);
-        }
-
-        return (float) ($category->getBasePriceForDate(now()) ?? $this->daily_rate ?? 0);
-    }
 }

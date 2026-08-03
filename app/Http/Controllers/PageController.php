@@ -10,9 +10,15 @@ class PageController extends Controller
 {
     public function show(string $slug)
     {
-        // Redirect /pages/inicio to home
+        // Redirect specific pages to the unified booking flow
         if ($slug === 'inicio') {
             return redirect('/');
+        }
+        if ($slug === 'vehiculos') {
+            return redirect()->route('search.results');
+        }
+        if ($slug === 'reservas') {
+            return redirect()->route('booking.manage');
         }
 
         $page = Page::where('slug', $slug)

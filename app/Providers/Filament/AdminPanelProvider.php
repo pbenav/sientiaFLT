@@ -18,6 +18,8 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
+use Filament\Navigation\NavigationItem;
+
 class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
@@ -34,6 +36,13 @@ class AdminPanelProvider extends PanelProvider
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
                 \App\Filament\Pages\Dashboard::class,
+            ])
+            ->navigationItems([
+                NavigationItem::make('Ver Web')
+                    ->url('/')
+                    ->icon('heroicon-o-globe-alt')
+                    ->sort(-1)
+                    ->openUrlInNewTab(),
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([

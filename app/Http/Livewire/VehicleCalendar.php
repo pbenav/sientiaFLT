@@ -34,18 +34,8 @@ class VehicleCalendar extends Component
         $startDate = \Carbon\Carbon::create($this->year, $this->month, 1)->startOfMonth();
         $endDate = \Carbon\Carbon::create($this->year, $this->month, 1)->endOfMonth();
 
-        $this->bookings = $this->vehicle->bookings()
-            ->whereIn('status', ['pending', 'confirmed', 'active'])
-            ->where(function ($query) use ($startDate, $endDate) {
-                $query->whereBetween('start_date', [$startDate, $endDate])
-                    ->orWhereBetween('end_date', [$startDate, $endDate])
-                    ->orWhere(function ($q) use ($startDate, $endDate) {
-                        $q->where('start_date', '<=', $startDate)
-                            ->where('end_date', '>=', $endDate);
-                    });
-            })
-            ->with('customer')
-            ->get();
+        $this->bookings = app(\App\Services\AvailabilityService::class)
+            ->getVehicleBookings($this->vehicle, $startDate, $endDate);
     }
 
     public function previousMonth()

@@ -17,6 +17,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Tables\Actions\ActionGroup;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Actions\UpdateBookingTotals;
 
 class BookingResource extends Resource
 {
@@ -28,93 +29,149 @@ class BookingResource extends Resource
 
     public static function form(Form $form): Form
     {
+        $updateTotals = UpdateBookingTotals::make();
+
         return $form
             ->schema([
-                Forms\Components\Section::make('Booking Information')
+                Forms\Components\Section::make(__('Información de la Reserva'))
                     ->schema([
                         Forms\Components\TextInput::make('booking_number')
+                            ->label(__('Localizador'))
                             ->required()
                             ->maxLength(50)
-                            ->default('BK-' . date('Ymd') . '-' . str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT))
+                            ->default(\App\Services\BookingNumberGenerator::generate())
                             ->disabled(),
                         Forms\Components\Select::make('customer_id')
-                            ->label('Customer')
+                            ->label(__('Cliente'))
                             ->options(Customer::orderBy('first_name')->get()->pluck('full_name', 'id'))
                             ->searchable()
                             ->required()
                             ->reactive(),
+                        Forms\Components\Placeholder::make('customer_details')
+                            ->label(__('Detalles del Cliente'))
+                            ->content(function (Forms\Get $get) {
+                                if ($customerId = $get('customer_id')) {
+                                    $customer = Customer::find($customerId);
+                                    if ($customer) {
+                                        return new \Illuminate\Support\HtmlString(
+                                            "<strong>Email:</strong> {$customer->email}<br>" .
+                                            "<strong>Teléfono:</strong> {$customer->phone}<br>" .
+                                            "<strong>DNI/NIF:</strong> {$customer->nif_cif}"
+                                        );
+                                    }
+                                }
+                                return '-';
+                            }),
                         Forms\Components\Select::make('vehicle_id')
-                            ->label('Vehicle')
+                            ->label(__('Vehículo'))
                             ->options(Vehicle::where('is_active', true)->orderBy('name')->get()->pluck('name', 'id'))
                             ->searchable()
-                            ->required(),
+                            ->required()
+                            ->live()
+                            ->afterStateUpdated($updateTotals),
                         Forms\Components\Select::make('location_id')
-                            ->label('Pick-up/Drop-off Location')
+                            ->label(__('Lugar de Recogida/Devolución'))
                             ->options(Location::orderBy('name')->get()->pluck('name', 'id'))
                             ->searchable()
                             ->nullable(),
                     ])->columns(2),
 
-                Forms\Components\Section::make('Dates')
+                Forms\Components\Section::make(__('Fechas'))
                     ->schema([
-                        Forms\Components\DateTimePicker::make('start_date')
+                        Forms\Components\DatePicker::make('start_date')
+                            ->label(__('Fecha de Recogida'))
                             ->required()
                             ->minDate(now())
-                            ->native(false),
-                        Forms\Components\DateTimePicker::make('end_date')
+                            ->native(false)
+                            ->live()
+                            ->afterStateUpdated($updateTotals),
+                        Forms\Components\DatePicker::make('end_date')
+                            ->label(__('Fecha de Devolución'))
                             ->required()
                             ->minDate(fn ($get) => $get('start_date') ?? now())
                             ->native(false)
-                            ->after(fn (Forms\Get $get) => $get('start_date') ?? now()),
-                        Forms\Components\DateTimePicker::make('pick_up_date'),
-                        Forms\Components\DateTimePicker::make('drop_off_date'),
-                    ])->columns(2),
+                            ->after(fn (Forms\Get $get) => $get('start_date') ?? now())
+                            ->live()
+                            ->afterStateUpdated($updateTotals),
+                        Forms\Components\Placeholder::make('total_days')
+                            ->label(__('Días de Alquiler'))
+                            ->content(function (Forms\Get $get) {
+                                $start = $get('start_date');
+                                $end = $get('end_date');
+                                if ($start && $end) {
+                                    $diff = \Carbon\Carbon::parse($start)->startOfDay()->diffInDays(\Carbon\Carbon::parse($end)->startOfDay());
+                                    $days = max(1, (int) $diff);
+                                    return $days . ' ' . ($days === 1 ? __('día') : __('días'));
+                                }
+                                return '-';
+                            }),
+                    ])->columns(3),
 
-                Forms\Components\Section::make('Pricing')
+                Forms\Components\Section::make(__('Precios'))
                     ->schema([
-                        Forms\Components\TextInput::make('total_amount')
-                            ->required()
-                            ->numeric()
-                            ->prefix('€')
-                            ->step(0.01),
-                        Forms\Components\TextInput::make('deposit_amount')
-                            ->numeric()
-                            ->prefix('€')
-                            ->step(0.01),
-                        Forms\Components\TextInput::make('discount_amount')
+                        Forms\Components\TextInput::make('subtotal')
+                            ->label(__('Subtotal'))
                             ->numeric()
                             ->prefix('€')
                             ->step(0.01)
-                            ->default(0),
+                            ->disabled()
+                            ->dehydrated(),
+                        Forms\Components\TextInput::make('discount_amount')
+                            ->label(__('Descuento'))
+                            ->numeric()
+                            ->prefix('€')
+                            ->step(0.01)
+                            ->default(0)
+                            ->live(debounce: 500)
+                            ->afterStateUpdated($updateTotals),
                         Forms\Components\TextInput::make('tax_amount')
+                            ->label(__('Impuestos'))
+                            ->numeric()
+                            ->prefix('€')
+                            ->step(0.01)
+                            ->disabled()
+                            ->dehydrated(),
+                        Forms\Components\TextInput::make('total_amount')
+                            ->label(__('Total a Pagar'))
+                            ->required()
+                            ->numeric()
+                            ->prefix('€')
+                            ->step(0.01)
+                            ->disabled()
+                            ->dehydrated(),
+                        Forms\Components\TextInput::make('deposit_amount')
+                            ->label(__('Fianza'))
                             ->numeric()
                             ->prefix('€')
                             ->step(0.01),
                     ])->columns(2),
 
-                Forms\Components\Section::make('Status')
+                Forms\Components\Section::make(__('Estado'))
                     ->schema([
                         Forms\Components\Select::make('status')
+                            ->label(__('Estado de la Reserva'))
                             ->required()
                             ->options([
-                                'pending' => 'Pending',
-                                'confirmed' => 'Confirmed',
-                                'active' => 'Active',
-                                'completed' => 'Completed',
-                                'cancelled' => 'Cancelled',
+                                'pending' => __('Pendiente'),
+                                'confirmed' => __('Confirmada'),
+                                'active' => __('Activa'),
+                                'completed' => __('Completada'),
+                                'cancelled' => __('Cancelada'),
                             ])
                             ->default('pending')
                             ->reactive(),
                         Forms\Components\Select::make('payment_status')
+                            ->label(__('Estado del Pago'))
                             ->required()
                             ->options([
-                                'unpaid' => 'Unpaid',
-                                'partial' => 'Partial',
-                                'paid' => 'Paid',
-                                'refunded' => 'Refunded',
+                                'unpaid' => __('No pagado'),
+                                'partial' => __('Pago parcial'),
+                                'paid' => __('Pagado'),
+                                'refunded' => __('Reembolsado'),
                             ])
                             ->default('unpaid'),
                         Forms\Components\Textarea::make('notes')
+                            ->label(__('Notas'))
                             ->maxLength(1000)
                             ->rows(3),
                     ]),
@@ -126,30 +183,35 @@ class BookingResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('booking_number')
+                    ->label(__('Localizador'))
                     ->searchable()
                     ->sortable()
                     ->copyable()
                     ->copyable(fn ($state) => (bool) $state),
                 Tables\Columns\TextColumn::make('customer.first_name')
-                    ->label('Customer')
+                    ->label(__('Cliente'))
                     ->formatStateUsing(fn ($record) => $record->customer?->full_name)
-                    ->searchable(['first_name', 'last_name'])
+                    ->description(fn ($record) => $record->customer?->email)
+                    ->searchable(['first_name', 'last_name', 'email', 'nif_cif'])
                     ->sortable(),
                 Tables\Columns\TextColumn::make('vehicle.name')
-                    ->label('Vehicle')
+                    ->label(__('Vehículo'))
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('start_date')
+                    ->label(__('Recogida'))
                     ->date('d/m/Y')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('end_date')
+                    ->label(__('Devolución'))
                     ->date('d/m/Y')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('duration_days')
-                    ->label('Days')
+                    ->label(__('Días'))
                     ->formatStateUsing(fn ($record) => $record->start_date && $record->end_date ? $record->start_date->diffInDays($record->end_date) : 0)
                     ->sortable(),
                 Tables\Columns\BadgeColumn::make('status')
+                    ->label(__('Estado'))
                     ->colors([
                         'warning' => 'pending',
                         'success' => 'confirmed',
@@ -158,6 +220,7 @@ class BookingResource extends Resource
                         'danger' => 'cancelled',
                     ]),
                 Tables\Columns\BadgeColumn::make('payment_status')
+                    ->label(__('Pago'))
                     ->colors([
                         'danger' => 'unpaid',
                         'warning' => 'partial',
@@ -165,37 +228,43 @@ class BookingResource extends Resource
                         'secondary' => 'refunded',
                     ]),
                 Tables\Columns\TextColumn::make('total_amount')
+                    ->label(__('Total'))
                     ->money('EUR')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
+                    ->label(__('Creada el'))
                     ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
+                    ->label(__('Estado'))
                     ->options([
-                        'pending' => 'Pending',
-                        'confirmed' => 'Confirmed',
-                        'active' => 'Active',
-                        'completed' => 'Completed',
-                        'cancelled' => 'Cancelled',
+                        'pending' => __('Pendiente'),
+                        'confirmed' => __('Confirmada'),
+                        'active' => __('Activa'),
+                        'completed' => __('Completada'),
+                        'cancelled' => __('Cancelada'),
                     ]),
                 Tables\Filters\SelectFilter::make('payment_status')
+                    ->label(__('Pago'))
                     ->options([
-                        'unpaid' => 'Unpaid',
-                        'partial' => 'Partial',
-                        'paid' => 'Paid',
-                        'refunded' => 'Refunded',
+                        'unpaid' => __('No pagado'),
+                        'partial' => __('Pago parcial'),
+                        'paid' => __('Pagado'),
+                        'refunded' => __('Reembolsado'),
                     ]),
                 Tables\Filters\SelectFilter::make('customer_id')
+                    ->label(__('Cliente'))
                     ->relationship('customer', 'first_name')
                     ->searchable(),
                 Tables\Filters\SelectFilter::make('vehicle_id')
+                    ->label(__('Vehículo'))
                     ->relationship('vehicle', 'name')
                     ->searchable(),
                 Tables\Filters\SelectFilter::make('start_date')
-                    ->label('Booking From')
+                    ->label(__('Reservas desde'))
                     ->options(function () {
                         return \App\Models\Booking::whereNotNull('start_date')
                             ->pluck('start_date', 'id')
@@ -203,7 +272,7 @@ class BookingResource extends Resource
                             ->toArray();
                     }),
                 Tables\Filters\SelectFilter::make('end_date')
-                    ->label('Booking To'),
+                    ->label(__('Reservas hasta')),
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
@@ -216,17 +285,17 @@ class BookingResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                     Tables\Actions\BulkAction::make('confirmBooking')
-                        ->label('Confirm Selected')
+                        ->label(__('Confirmar Seleccionadas'))
                         ->action(fn ($records) => $records->where('status', 'pending')->each->update(['status' => 'confirmed']))
                         ->icon('heroicon-o-check-circle')
                         ->requiresConfirmation(),
                     Tables\Actions\BulkAction::make('cancelBooking')
-                        ->label('Cancel Selected')
+                        ->label(__('Cancelar Seleccionadas'))
                         ->action(fn ($records) => $records->whereNotIn('status', ['completed', 'cancelled'])->each->update(['status' => 'cancelled']))
                         ->icon('heroicon-o-x-circle')
                         ->requiresConfirmation()
-                        ->modalHeading('Cancel Bookings')
-                        ->modalDescription('Are you sure you want to cancel the selected bookings? This action cannot be undone.'),
+                        ->modalHeading(__('Cancelar Reservas'))
+                        ->modalDescription(__('¿Estás seguro de querer cancelar las reservas seleccionadas? Esta acción no se puede deshacer.')),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');

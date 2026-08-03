@@ -46,7 +46,7 @@ class Booking extends Model
 
         static::creating(function ($booking) {
             if (empty($booking->booking_number)) {
-                $booking->booking_number = 'BK-' . date('Ymd') . '-' . str_pad(Booking::whereDate('created_at', today())->count() + 1, 4, '0', STR_PAD_LEFT);
+                $booking->booking_number = \App\Services\BookingNumberGenerator::generate();
             }
         });
     }

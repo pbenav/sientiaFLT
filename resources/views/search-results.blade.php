@@ -1,247 +1,233 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <!-- Breadcrumb -->
-    <nav class="flex mb-6" aria-label="Breadcrumb">
-        <ol class="flex items-center space-x-2">
-            <li><a href="/" class="text-gray-400 hover:text-gray-500">Home</a></li>
-            <li><svg class="h-5 w-5 text-gray-300" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/></svg></li>
-            <li><span class="text-gray-900 font-medium">Search Results</span></li>
-        </ol>
-    </nav>
-
-    <div class="flex flex-col lg:flex-row gap-6">
-        <!-- Filters Sidebar -->
-        <div class="lg:w-64 flex-shrink-0">
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 sticky top-20">
-                <h3 class="font-bold text-gray-900 mb-4 flex items-center">
-                    <svg class="h-5 w-5 mr-2 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
-                    </svg>
-                    Filters
-                </h3>
-
-                <!-- Vehicle Type -->
-                <div class="mb-6">
-                    <h4 class="text-sm font-semibold text-gray-700 mb-3">Vehicle Type</h4>
-                    <div class="space-y-2">
-                        @foreach(['compact' => 'Compact', 'suv' => 'SUV', 'sedan' => 'Sedan', 'van' => 'Van', 'truck' => 'Truck'] as $type => $label)
-                        <label class="flex items-center">
-                            <input type="checkbox" value="{{ $type }}" class="type-filter rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                            <span class="ml-2 text-sm text-gray-600">{{ $label }}</span>
-                        </label>
-                        @endforeach
-                    </div>
-                </div>
-
-                <!-- Transmission -->
-                <div class="mb-6">
-                    <h4 class="text-sm font-semibold text-gray-700 mb-3">Transmission</h4>
-                    <div class="space-y-2">
-                        @foreach(['automatic' => 'Automatic', 'manual' => 'Manual'] as $trans => $label)
-                        <label class="flex items-center">
-                            <input type="checkbox" value="{{ $trans }}" class="transmission-filter rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                            <span class="ml-2 text-sm text-gray-600">{{ $label }}</span>
-                        </label>
-                        @endforeach
-                    </div>
-                </div>
-
-                <!-- Fuel Type -->
-                <div class="mb-6">
-                    <h4 class="text-sm font-semibold text-gray-700 mb-3">Fuel Type</h4>
-                    <div class="space-y-2">
-                        @foreach(['petrol' => 'Petrol', 'diesel' => 'Diesel', 'electric' => 'Electric', 'hybrid' => 'Hybrid'] as $fuel => $label)
-                        <label class="flex items-center">
-                            <input type="checkbox" value="{{ $fuel }}" class="fuel-filter rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                            <span class="ml-2 text-sm text-gray-600">{{ $label }}</span>
-                        </label>
-                        @endforeach
-                    </div>
-                </div>
-
-                <!-- Price Range -->
-                <div class="mb-6">
-                    <h4 class="text-sm font-semibold text-gray-700 mb-3">Price per day</h4>
-                    <div class="flex items-center space-x-2">
-                        <input type="number" placeholder="Min" class="input-field text-sm" id="min-price">
-                        <span class="text-gray-400">-</span>
-                        <input type="number" placeholder="Max" class="input-field text-sm" id="max-price">
-                    </div>
-                </div>
-
-                <button onclick="applyFilters()" class="btn-primary text-white w-full py-2 rounded-lg text-sm font-medium">
-                    Apply Filters
-                </button>
-                <button onclick="resetFilters()" class="text-gray-500 w-full py-2 mt-2 text-sm hover:text-gray-700">
-                    Reset
-                </button>
+<section class="ex-section" style="background: #F4F5F6; min-height: calc(100vh - 200px);">
+    <div class="container-ex">
+        
+        <!-- Header Banner -->
+        <div style="background: linear-gradient(135deg, #161829 0%, #292D45 100%); padding: 60px 0; margin: 0 -20px 40px -20px;">
+            <div style="max-width: 1200px; margin: 0 auto; text-align: center; padding: 0 20px;">
+                <h1 style="font-size: 40px; font-weight: 800; color: #ffffff; margin-bottom: 15px; font-family: 'Space Grotesk', sans-serif;">{{ __('Nuestra Flota') }}</h1>
+                <p style="font-size: 16px; color: #94a3b8; max-width: 600px; margin: 0 auto;">
+                    @if(isset($totalResults))
+                        {{ __('Hemos encontrado') }} <strong>{{ $totalResults }}</strong> {{ __('vehículos disponibles para tus fechas.') }}
+                    @else
+                        {{ __('Descubre nuestra selección de vehículos premium, listos para tu aventura.') }}
+                    @endif
+                </p>
             </div>
         </div>
 
-        <!-- Results -->
-        <div class="flex-1">
-            <div class="flex items-center justify-between mb-6">
-                <h1 class="text-2xl font-bold text-gray-900">
-                    Search Results
-                    @if(isset($totalResults))
-                        <span class="text-lg font-normal text-gray-500">({{ $totalResults }} vehicles)</span>
-                    @endif
-                </h1>
-                <div class="flex items-center space-x-2">
-                    <span class="text-sm text-gray-500">Sort by:</span>
-                    <select class="select-field text-sm py-1.5" onchange="sortResults(this.value)">
-                        <option value="price_asc">Price: Low to High</option>
-                        <option value="price_desc">Price: High to Low</option>
-                        <option value="name">Name: A-Z</option>
-                        <option value="rating">Rating</option>
-                    </select>
+        <div class="flex flex-col lg:flex-row gap-8">
+            
+            <!-- Filters Sidebar -->
+            <div class="lg:w-72 flex-shrink-0">
+                <div class="ex-card lg:sticky lg:top-24 mb-6">
+                    <div class="ex-card-body">
+                        <h3 class="font-bold text-gray-900 mb-5 flex items-center" style="font-family: 'Space Grotesk', sans-serif; font-size: 1.2rem;">
+                            <svg class="h-5 w-5 mr-2 text-ex-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                            </svg>
+                            {{ __('Filtros') }}
+                        </h3>
+
+                    <!-- Fechas Resumen -->
+                    <div class="mb-6 p-4 bg-gray-50 rounded-lg text-sm text-gray-600 border border-gray-100">
+                        <div class="flex justify-between mb-2">
+                            <span class="font-bold">{{ __('Recogida:') }}</span>
+                            <span>{{ $pickup->format('d/m/Y') }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="font-bold">{{ __('Devolución:') }}</span>
+                            <span>{{ $dropoff->format('d/m/Y') }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Vehicle Type -->
+                    <div class="mb-6">
+                        <h4 class="text-sm font-bold text-gray-800 mb-3 uppercase tracking-wide">{{ __('Tipo de Vehículo') }}</h4>
+                        <div class="space-y-2">
+                            @foreach(\App\Models\VehicleCategory::where('is_active', true)->get() as $category)
+                            <label class="flex items-center cursor-pointer group">
+                                <input type="checkbox" value="{{ $category->id }}" class="category-filter rounded border-gray-300 text-ex-accent focus:ring-ex-accent transition-colors"
+                                    {{ in_array((string)$category->id, explode(',', request('categories', ''))) ? 'checked' : '' }}>
+                                <span class="ml-2 text-sm text-gray-600 group-hover:text-ex-primary transition-colors">{{ $category->name }}</span>
+                            </label>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    <!-- Transmission -->
+                    <div class="mb-6">
+                        <h4 class="text-sm font-bold text-gray-800 mb-3 uppercase tracking-wide">{{ __('Transmisión') }}</h4>
+                        <div class="space-y-2">
+                            @foreach(['automatic' => __('Automático'), 'manual' => __('Manual')] as $trans => $label)
+                            <label class="flex items-center cursor-pointer group">
+                                <input type="checkbox" value="{{ $trans }}" class="transmission-filter rounded border-gray-300 text-ex-accent focus:ring-ex-accent transition-colors">
+                                <span class="ml-2 text-sm text-gray-600 group-hover:text-ex-primary transition-colors">{{ $label }}</span>
+                            </label>
+                            @endforeach
+                        </div>
+                    </div>
+
+                        <button onclick="applyFilters()" class="ex-btn ex-btn-primary w-full mb-3 shadow-md hover:shadow-lg">
+                            {{ __('Aplicar Filtros') }}
+                        </button>
+                        <button onclick="resetFilters()" class="ex-btn ex-btn-white border border-gray-200 w-full text-gray-600">
+                            {{ __('Restablecer') }}
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            @if(isset($results) && count($results) > 0)
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    @foreach($results as $vehicle)
-                    <div class="card-hover bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                        <!-- Vehicle Image -->
-                        <div class="relative">
-                            @if($vehicle->primaryImage && $vehicle->primaryImage->url)
-                                <img src="{{ $vehicle->primaryImage->url }}" alt="{{ $vehicle->name }}" class="vehicle-card-image">
-                            @else
-                                <div class="vehicle-card-image bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                                    <svg class="h-16 w-16 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 7a2 2 0 11-4 0 2 2 0 014 0z" />
-                                    </svg>
-                                </div>
-                            @endif
-                            <!-- Badges -->
-                            <div class="absolute top-3 left-3 flex flex-wrap gap-1">
-                                @if($vehicle->is_electric)
-                                    <span class="badge-type bg-green-500 text-white">Electric</span>
-                                @endif
-                                @if($vehicle->is_new)
-                                    <span class="badge-type bg-blue-500 text-white">New</span>
-                                @endif
-                                @if($vehicle->is_featured)
-                                    <span class="badge-type bg-yellow-500 text-white">Featured</span>
-                                @endif
-                            </div>
-                            <!-- Favorite -->
-                            <button class="absolute top-3 right-3 p-2 bg-white/80 rounded-full hover:bg-white transition-colors">
-                                <svg class="h-5 w-5 text-gray-400 hover:text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-                                </svg>
-                            </button>
-                        </div>
-
-                        <!-- Vehicle Info -->
-                        <div class="p-4">
-                            <div class="flex items-start justify-between mb-2">
-                                <div>
-                                    <h3 class="font-bold text-gray-900 text-lg">{{ $vehicle->name }}</h3>
-                                    <p class="text-gray-500 text-sm">{{ $vehicle->brand }} - {{ $vehicle->model }} ({{ $vehicle->year }})</p>
-                                </div>
-                            </div>
-
-                            <!-- Vehicle Specs -->
-                            <div class="flex items-center gap-3 mb-3 text-xs text-gray-500">
-                                @if($vehicle->seats)
-                                <span class="flex items-center">
-                                    <svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-                                    </svg>
-                                    {{ $vehicle->seats }} seats
-                                </span>
-                                @endif
-                                @if($vehicle->transmission)
-                                <span class="flex items-center">
-                                    <svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                    </svg>
-                                    {{ ucfirst($vehicle->transmission) }}
-                                </span>
-                                @endif
-                                @if($vehicle->fuel_type)
-                                <span class="flex items-center">
-                                    <svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                                    </svg>
-                                    {{ ucfirst($vehicle->fuel_type) }}
-                                </span>
-                                @endif
-                            </div>
-
-                            <!-- Location -->
-                            @if($vehicle->location)
-                            <div class="flex items-center text-xs text-gray-400 mb-3">
-                                <svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                </svg>
-                                {{ $vehicle->location->name }}
-                            </div>
-                            @endif
-
-                            <!-- Price & CTA -->
-                            <div class="flex items-center justify-between pt-3 border-t border-gray-100">
-                                <div>
-                                    <span class="text-2xl font-bold text-blue-600">€{{ number_format($vehicle->daily_rate, 2) }}</span>
-                                    <span class="text-gray-400 text-sm">/day</span>
-                                </div>
-                                <a href="/book/{{ $vehicle->id }}/{{ auth()->id() ?? 1 }}" class="btn-primary text-white px-4 py-2 rounded-lg text-sm font-medium">
-                                    Book Now
-                                </a>
-                            </div>
-                        </div>
+            <!-- Results Grid -->
+            <div class="flex-1">
+                <!-- Toolbar -->
+                <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-4 mb-6 flex items-center justify-between">
+                    <span class="text-gray-500 text-sm">
+                        <span class="font-bold text-gray-900">{{ count($results) }}</span> {{ __('vehículos mostrados') }}
+                    </span>
+                    <div class="flex items-center space-x-3">
+                        <span class="text-sm font-medium text-gray-700 hidden sm:inline-block">{{ __('Ordenar:') }}</span>
+                        <select class="ex-select py-2 pl-3 pr-8 text-sm bg-gray-50 border-gray-200" style="width: auto; min-width: 180px;" onchange="sortResults(this.value)">
+                            <option value="price_asc">{{ __('Precio: Menor a Mayor') }}</option>
+                            <option value="price_desc">{{ __('Precio: Mayor a Menor') }}</option>
+                            <option value="name">{{ __('Nombre: A-Z') }}</option>
+                        </select>
                     </div>
-                    @endforeach
                 </div>
-            @else
-                <div class="text-center py-16 bg-white rounded-xl border border-gray-100">
-                    <svg class="h-16 w-16 text-gray-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                    </svg>
-                    <h3 class="text-xl font-bold text-gray-900 mb-2">No vehicles found</h3>
-                    <p class="text-gray-500 mb-6">Try adjusting your search criteria or filters</p>
-                    <a href="/" class="btn-primary text-white px-6 py-2.5 rounded-lg text-sm font-medium inline-block">
-                        Back to Search
-                    </a>
-                </div>
-            @endif
+
+                @if(isset($results) && count($results) > 0)
+                    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                        @foreach($results as $vehicle)
+                        <div class="ex-card flex flex-col h-full bg-white shadow-sm hover:shadow-xl transition-all duration-300">
+                            <!-- Image Container -->
+                            <div class="relative h-48 overflow-hidden group">
+                                @if($vehicle->primaryImage && $vehicle->primaryImage->url)
+                                    <img src="{{ $vehicle->primaryImage->url }}" alt="{{ $vehicle->name }}" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500">
+                                @else
+                                    <div class="w-full h-full bg-gray-200 flex items-center justify-center">
+                                        <svg class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 7a2 2 0 11-4 0 2 2 0 014 0z M9 17a2 2 0 11-4 0 2 2 0 014 0z" />
+                                        </svg>
+                                    </div>
+                                @endif
+
+                                <!-- Badges overlay -->
+                                <div class="absolute top-3 left-3 flex flex-col gap-2">
+                                    @if($vehicle->is_electric)
+                                        <span class="bg-green-500 text-white text-xs font-bold px-2.5 py-1 rounded-sm shadow-sm uppercase tracking-wide">{{ __('Eco') }}</span>
+                                    @endif
+                                    @if($vehicle->is_new)
+                                        <span class="bg-blue-600 text-white text-xs font-bold px-2.5 py-1 rounded-sm shadow-sm uppercase tracking-wide">{{ __('Nuevo') }}</span>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <!-- Card Body -->
+                            <div class="ex-card-body flex-1 flex flex-col p-5">
+                                <div class="mb-3">
+                                    <h3 class="ex-card-title text-xl mb-1">{{ $vehicle->name }}</h3>
+                                    <p class="text-gray-500 text-sm font-medium">{{ $vehicle->brand }} - {{ $vehicle->model }}</p>
+                                </div>
+
+                                <!-- Features Grid -->
+                                <div class="grid grid-cols-2 gap-y-2 mb-4 mt-auto border-t border-b border-gray-100 py-3">
+                                    @if($vehicle->seats)
+                                    <div class="flex items-center text-sm text-gray-600">
+                                        <svg class="h-4 w-4 mr-1.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                        </svg>
+                                        {{ $vehicle->seats }} {{ __('plazas') }}
+                                    </div>
+                                    @endif
+                                    
+                                    @if($vehicle->transmission)
+                                    <div class="flex items-center text-sm text-gray-600">
+                                        <svg class="h-4 w-4 mr-1.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        </svg>
+                                        {{ ucfirst($vehicle->transmission) }}
+                                    </div>
+                                    @endif
+                                </div>
+
+                                <!-- Booking Action -->
+                                <div class="mt-2">
+                                    <div class="flex items-baseline mb-3">
+                                        <span class="ex-card-price text-2xl mr-2">€{{ number_format($vehicle->calculatePrice($days, $pickup), 2) }}</span>
+                                        <span class="text-sm text-gray-400 font-medium">{{ __('Total por') }} {{ $days }} {{ $days == 1 ? __('día') : __('días') }}</span>
+                                    </div>
+                                    
+                                    <form action="{{ route('booking.checkout') }}" method="GET" class="m-0">
+                                        <input type="hidden" name="vehicle_id" value="{{ $vehicle->id }}">
+                                        <input type="hidden" name="pickup_date" value="{{ $pickup->format('Y-m-d') }}">
+                                        <input type="hidden" name="dropoff_date" value="{{ $dropoff->format('Y-m-d') }}">
+                                        <button type="submit" class="ex-btn ex-btn-primary w-full flex items-center justify-center group shadow-md hover:shadow-lg">
+                                            {{ __('Reservar Ahora') }}
+                                            <svg class="h-4 w-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                                            </svg>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-16 text-center">
+                        <div class="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-gray-100 mb-6">
+                            <svg class="h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-900 mb-3" style="font-family: 'Space Grotesk', sans-serif;">{{ __('No se encontraron vehículos') }}</h3>
+                        <p class="text-gray-500 mb-8 max-w-md mx-auto">{{ __('No tenemos vehículos disponibles que coincidan con tus fechas y filtros. Prueba a cambiar las fechas o los criterios de búsqueda.') }}</p>
+                        <a href="/" class="ex-btn ex-btn-primary inline-flex items-center">
+                            <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                            </svg>
+                            {{ __('Volver al inicio') }}
+                        </a>
+                    </div>
+                @endif
+            </div>
         </div>
     </div>
-</div>
+</section>
 
 @push('scripts')
 <script>
     function applyFilters() {
-        const types = Array.from(document.querySelectorAll('.type-filter:checked')).map(el => el.value);
+        const categories = Array.from(document.querySelectorAll('.category-filter:checked')).map(el => el.value);
         const transmissions = Array.from(document.querySelectorAll('.transmission-filter:checked')).map(el => el.value);
-        const fuels = Array.from(document.querySelectorAll('.fuel-filter:checked')).map(el => el.value);
-        const minPrice = document.getElementById('min-price').value;
-        const maxPrice = document.getElementById('max-price').value;
-
-        let url = '/search?';
-        if (types.length) url += 'types=' + types.join(',') + '&';
-        if (transmissions.length) url += 'transmissions=' + transmissions.join(',') + '&';
-        if (fuels.length) url += 'fuels=' + fuels.join(',') + '&';
-        if (minPrice) url += 'min_price=' + minPrice + '&';
-        if (maxPrice) url += 'max_price=' + maxPrice + '&';
-
-        window.location.href = url;
+        
+        // Mantener las fechas en la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        if (categories.length) urlParams.set('categories', categories.join(','));
+        else urlParams.delete('categories');
+        
+        if (transmissions.length) urlParams.set('transmissions', transmissions.join(','));
+        else urlParams.delete('transmissions');
+        
+        window.location.search = urlParams.toString();
     }
 
     function resetFilters() {
-        document.querySelectorAll('.type-filter, .transmission-filter, .fuel-filter').forEach(el => el.checked = false);
-        document.getElementById('min-price').value = '';
-        document.getElementById('max-price').value = '';
-        applyFilters();
+        document.querySelectorAll('.category-filter, .transmission-filter').forEach(el => el.checked = false);
+        const urlParams = new URLSearchParams(window.location.search);
+        urlParams.delete('categories');
+        urlParams.delete('transmissions');
+        window.location.search = urlParams.toString();
     }
 
     function sortResults(value) {
-        window.location.href = '/search?sort=' + value;
+        const urlParams = new URLSearchParams(window.location.search);
+        urlParams.set('sort', value);
+        window.location.search = urlParams.toString();
     }
 </script>
 @endpush

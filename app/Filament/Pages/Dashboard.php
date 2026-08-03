@@ -30,6 +30,7 @@ class Dashboard extends BaseDashboard
     public function getWidgets(): array
     {
         return [
+            \App\Filament\Widgets\NewBookingNotificationWidget::class,
             \App\Filament\Widgets\DashboardStatsWidget::class,
             \App\Filament\Widgets\RevenueChartWidget::class,
             \App\Filament\Widgets\BookingStatusChartWidget::class,

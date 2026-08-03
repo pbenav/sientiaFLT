@@ -6,7 +6,7 @@ use App\Filament\Resources\VehicleCategoryResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
-class EditVehicleCategory extends EditRecord
+class EditVehicleCategory extends \App\Filament\Resources\Pages\BaseEditRecord
 {
     protected static string $resource = VehicleCategoryResource::class;
 
@@ -16,4 +16,5 @@ class EditVehicleCategory extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
-}
+
+    }

@@ -56,42 +56,19 @@
     <div class="ex-hero-overlay"></div>
     <div class="ex-hero-content container-ex">
         <h1 class="ex-hero-title">¡Hola!, ¿Buscas una moto?</h1>
-        <p class="ex-hero-subtitle">Estás en el mejor sitio</p>
+        <p class="ex-hero-subtitle" style="font-family: 'Space Grotesk', sans-serif; font-weight: 600;">Estás en el mejor sitio</p>
 
         <!-- Search Form -->
         <div class="ex-search-bar max-w-4xl mx-auto">
-            <div class="ex-search-grid">
+            <form id="vehicle-search-form" action="{{ route('search.results') }}" method="GET" class="ex-search-grid">
                 <!-- Recogida -->
                 <div>
                     <div class="flex items-center justify-between mb-2">
                         <label class="ex-search-label">Recogida</label>
                         <span class="text-xs text-ex-accent font-medium cursor-pointer">Información</span>
                     </div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <select class="ex-select">
-                            <option>08:00</option>
-                            <option>08:30</option>
-                            <option>09:00</option>
-                            <option>09:30</option>
-                            <option>10:00</option>
-                            <option>10:30</option>
-                            <option>11:00</option>
-                            <option>11:30</option>
-                            <option>12:00</option>
-                            <option>12:30</option>
-                            <option>13:00</option>
-                            <option>13:30</option>
-                            <option>14:00</option>
-                            <option>14:30</option>
-                            <option>15:00</option>
-                            <option>15:30</option>
-                            <option>16:00</option>
-                            <option>16:30</option>
-                            <option>17:00</option>
-                            <option>17:30</option>
-                            <option>18:00</option>
-                        </select>
-                        <input type="date" class="ex-input" min="{{ date('Y-m-d') }}">
+                    <div class="w-full">
+                        <input type="date" name="pickup_date" class="ex-input w-full" min="{{ date('Y-m-d') }}" required>
                     </div>
                 </div>
 
@@ -101,57 +78,32 @@
                         <label class="ex-search-label">Devolución</label>
                         <span class="text-xs text-ex-accent font-medium cursor-pointer">Información</span>
                     </div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <select class="ex-select">
-                            <option>08:00</option>
-                            <option>08:30</option>
-                            <option>09:00</option>
-                            <option>09:30</option>
-                            <option>10:00</option>
-                            <option>10:30</option>
-                            <option>11:00</option>
-                            <option>11:30</option>
-                            <option>12:00</option>
-                            <option>12:30</option>
-                            <option>13:00</option>
-                            <option>13:30</option>
-                            <option>14:00</option>
-                            <option>14:30</option>
-                            <option>15:00</option>
-                            <option>15:30</option>
-                            <option>16:00</option>
-                            <option>16:30</option>
-                            <option>17:00</option>
-                            <option>17:30</option>
-                            <option>18:00</option>
-                        </select>
-                        <input type="date" class="ex-input" min="{{ date('Y-m-d') }}">
+                    <div class="w-full">
+                        <input type="date" name="dropoff_date" class="ex-input w-full" min="{{ date('Y-m-d') }}" required>
                     </div>
                 </div>
 
                 <!-- Vehicle Type -->
                 <div>
-                    <label class="ex-search-label">Tipo de Vehículo</label>
-                    <select class="ex-select">
-                        <option value="">Todos los vehículos</option>
-                        <option value="scooter">Motos 125cc</option>
-                        <option value="compact">Compactos</option>
-                        <option value="suv">SUV</option>
-                        <option value="sedan">Sedán</option>
-                        <option value="van">Furgonetas</option>
+                    <label class="ex-search-label">Categoría de Vehículo</label>
+                    <select name="categories" class="ex-select">
+                        <option value="">Todas las categorías</option>
+                        @foreach(\App\Models\VehicleCategory::where('is_active', true)->get() as $category)
+                            <option value="{{ $category->id }}">{{ $category->name }}</option>
+                        @endforeach
                     </select>
                 </div>
 
                 <!-- Search Button -->
                 <div>
-                    <button type="button" onclick="document.querySelector('#vehicle-search-form')?.dispatchEvent(new Event('submit'))" class="ex-btn ex-btn-primary ex-btn-lg w-full" style="white-space:nowrap;">
+                    <button type="submit" class="ex-btn ex-btn-primary ex-btn-lg w-full" style="white-space:nowrap;">
                         <svg class="inline h-4 w-4 mr-1.5 -mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                         </svg>
                         Buscar
                     </button>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
 </section>

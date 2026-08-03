@@ -14,10 +14,11 @@ class CategoryVolumeDiscount extends Model
         'min_days',
         'max_days',
         'discount_percent',
+        'sort_order',
     ];
 
     protected $casts = [
-        'discount_percent' => 'integer',
+        'discount_percent' => 'decimal:2',
     ];
 
     public function category(): BelongsTo

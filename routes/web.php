@@ -10,7 +10,12 @@ use App\Http\Controllers\PageController;
 Route::get('/', WelcomeController::class)->name('home');
 
 Route::get('/search', SearchResultsController::class)->name('search.results');
-Route::get('/book/{vehicle}/{customer}', [BookingController::class, 'form'])->name('bookings.form');
+
+Route::get('/booking/checkout', [BookingController::class, 'checkout'])->name('booking.checkout');
+Route::post('/booking/confirm', [BookingController::class, 'confirm'])->name('booking.confirm');
+Route::get('/booking/success/{booking}', [BookingController::class, 'success'])->name('booking.success');
+Route::get('/mis-reservas', \App\Http\Livewire\ManageBooking::class)->name('booking.manage');
+
 Route::get('/calendar/{vehicle}', [CalendarController::class, 'show'])->name('calendar.vehicle');
 
 // Dynamic pages

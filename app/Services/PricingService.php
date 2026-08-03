@@ -7,7 +7,7 @@ use App\Models\PriceRule;
 use App\Models\VehicleExtra;
 use Carbon\Carbon;
 
-class PricingService
+class PricingService implements \App\Interfaces\PricingServiceInterface
 {
     public function calculatePrice(Vehicle $vehicle, $startDate, $endDate, array $extras = []): array
     {
@@ -85,8 +85,17 @@ class PricingService
 
     protected function calculateBasePrice(Vehicle $vehicle, array $rules, Carbon $startDate, Carbon $endDate, int $days): float
     {
+        // First get the baseline price for the period by checking price periods per day
+        $baselineTotal = 0;
+        $currentDate = $startDate->copy();
+        for ($i = 0; $i < $days; $i++) {
+            $baselineDaily = $vehicle->category ? $vehicle->category->getBasePriceForDate($currentDate) : $vehicle->daily_rate;
+            $baselineTotal += $baselineDaily;
+            $currentDate->addDay();
+        }
+
         if (empty($rules)) {
-            return $vehicle->daily_rate * $days;
+            return $baselineTotal;
         }
 
         $total = 0;
@@ -103,16 +112,18 @@ class PricingService
             }
 
             $ruleDays = max(1, floor(($overlapEnd - $overlapStart) / 86400));
-            $rulePrice = $this->getRulePrice($rule, $ruleDays, $vehicle);
+            // Get average daily base price for the baseline if rule doesn't have a base_price
+            $averageDailyBaseline = $baselineTotal / $days;
+            $rulePrice = $this->getRulePrice($rule, $ruleDays, $vehicle, $averageDailyBaseline);
             $total += $rulePrice * $ruleDays;
         }
 
-        return $total > 0 ? $total : $vehicle->daily_rate * $days;
+        return $total > 0 ? $total : $baselineTotal;
     }
 
-    protected function getRulePrice(array $rule, int $days, Vehicle $vehicle): float
+    protected function getRulePrice(array $rule, int $days, Vehicle $vehicle, float $defaultBasePrice = null): float
     {
-        $basePrice = $rule['base_price'] ?? $vehicle->daily_rate;
+        $basePrice = $rule['base_price'] ?? $defaultBasePrice ?? $vehicle->daily_rate;
 
         if ($rule['rule_type'] === 'weekly' && $days >= 7) {
             return min($basePrice, ($basePrice / 7) * $days * 0.85);
@@ -143,17 +154,11 @@ class PricingService
     }
 
     /**
-     * Get the volume discount percentage for a vehicle based on its category and number of days.
+     * Get the volume discount percentage for a vehicle based on its number of days.
      */
     public function getVolumeDiscountPercentage(Vehicle $vehicle, int $days): float
     {
-        $category = $vehicle->category;
-
-        if (!$category) {
-            return 0;
-        }
-
-        return $category->getDiscountForDays($days);
+        return $vehicle->category ? $vehicle->category->getDiscountForDays($days) : 0;
     }
 
     protected function calculateExtras($extras, int $days): float

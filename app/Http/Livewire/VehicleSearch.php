@@ -2,7 +2,8 @@
 
 namespace App\Http\Livewire;
 
-use App\Models\Vehicle;
+use App\DTOs\VehicleSearchDto;
+use App\Services\AvailabilityService;
 use App\Models\Location;
 use Livewire\Component;
 
@@ -24,45 +25,32 @@ class VehicleSearch extends Component
 
     public function search()
     {
-        $query = Vehicle::active()->available();
+        $dto = VehicleSearchDto::fromRequest([
+            'location_id' => $this->location_id,
+            'type' => $this->vehicle_type,
+            'transmission' => $this->transmission,
+            'fuel_type' => $this->fuel_type,
+            'min_seats' => $this->passengers > 1 ? $this->passengers : null,
+            'min_price' => $this->min_price,
+            'max_price' => $this->max_price,
+            'search' => $this->search_term,
+            'start_date' => $this->start_date,
+            'end_date' => $this->end_date,
+        ]);
 
-        if ($this->location_id) {
-            $query->where('location_id', $this->location_id);
-        }
-
-        if ($this->vehicle_type) {
-            $query->where('type', $this->vehicle_type);
-        }
-
-        if ($this->transmission) {
-            $query->where('transmission', $this->transmission);
-        }
-
-        if ($this->fuel_type) {
-            $query->where('fuel_type', $this->fuel_type);
-        }
-
-        if ($this->passengers > 1) {
-            $query->where('seats', '>=', $this->passengers);
-        }
-
-        if ($this->min_price) {
-            $query->where('daily_rate', '>=', $this->min_price);
-        }
-
-        if ($this->max_price) {
-            $query->where('daily_rate', '<=', $this->max_price);
-        }
-
-        if ($this->search_term) {
-            $query->where(function ($q) {
-                $q->where('name', 'like', "%{$this->search_term}%")
-                    ->orWhere('brand', 'like', "%{$this->search_term}%")
-                    ->orWhere('model', 'like', "%{$this->search_term}%");
-            });
-        }
-
-        $this->results = $query->with(['location', 'primaryImage'])->get();
+        $this->results = app(AvailabilityService::class)->getAvailableVehicles(
+            categoryId: null,
+            type: $dto->type,
+            fuelType: $dto->fuelType,
+            transmission: $dto->transmission,
+            minSeats: $dto->minSeats,
+            minPrice: $dto->minPrice,
+            maxPrice: $dto->maxPrice,
+            search: $dto->search,
+            startDate: $dto->startDate,
+            endDate: $dto->endDate,
+            locationId: $dto->locationId,
+        );
 
         return redirect()->route('search.results', [
             'start_date' => $this->start_date,

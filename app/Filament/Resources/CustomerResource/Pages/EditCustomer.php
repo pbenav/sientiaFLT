@@ -6,7 +6,7 @@ use App\Filament\Resources\CustomerResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
-class EditCustomer extends EditRecord
+class EditCustomer extends \App\Filament\Resources\Pages\BaseEditRecord
 {
     protected static string $resource = CustomerResource::class;
 
@@ -16,4 +16,5 @@ class EditCustomer extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
-}
+
+    }

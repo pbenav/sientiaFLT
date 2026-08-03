@@ -6,7 +6,7 @@ use App\Filament\Resources\PricePeriodResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
-class EditPricePeriod extends EditRecord
+class EditPricePeriod extends \App\Filament\Resources\Pages\BaseEditRecord
 {
     protected static string $resource = PricePeriodResource::class;
 

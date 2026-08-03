@@ -148,7 +148,8 @@ class VehicleResource extends Resource
 
                         Forms\Components\TextInput::make('doors')
                             ->numeric()
-                            ->minValue(1)
+                            ->nullable()
+                            ->minValue(0)
                             ->maxValue(8),
 
                         Forms\Components\TextInput::make('luggage_large')
@@ -189,6 +190,17 @@ class VehicleResource extends Resource
                         Forms\Components\Toggle::make('is_hybrid')
                             ->label('Híbrido'),
                     ])->columns(4),
+
+                Forms\Components\Section::make('Precio Base (Opcional)')
+                    ->schema([
+                        Forms\Components\TextInput::make('daily_rate')
+                            ->label('Precio Base Diario (Sobrescribe a la categoría si no hay períodos)')
+                            ->required()
+                            ->numeric()
+                            ->prefix('€')
+                            ->default(0.00)
+                            ->step(0.01),
+                    ]),
 
                 Forms\Components\Section::make('Descripción')
                     ->schema([
@@ -253,14 +265,12 @@ class VehicleResource extends Resource
                         default => 'gray',
                     }),
 
-                Tables\Columns\TextColumn::make('category.pricePeriods.0.base_price')
-                    ->label('Precio base/día')
+                Tables\Columns\TextColumn::make('category_price')
+                    ->label('Precio/día (Cat.)')
                     ->formatStateUsing(function ($state, $record) {
-                        if (! $record->category) return '—';
-                        $currentPrice = $record->getCurrentBasePrice();
+                        $currentPrice = $record->category ? $record->category->getCurrentBasePrice() : $record->daily_rate;
                         return number_format($currentPrice, 2, ',', '.') . ' €';
-                    })
-                    ->sortable(),
+                    }),
 
                 Tables\Columns\IconColumn::make('is_active')
                     ->label('Activo')

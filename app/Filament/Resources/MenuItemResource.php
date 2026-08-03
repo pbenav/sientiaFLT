@@ -63,7 +63,7 @@ class MenuItemResource extends Resource
                     ->required(fn ($get) => $get('type') === 'custom')
                     ->visible(fn ($get) => $get('type') === 'custom'),
 
-                TextInput::make('target')
+                Select::make('target')
                     ->label('Target')
                     ->options([
                         '_self' => 'Misma ventana',

@@ -16,6 +16,7 @@ class AppServiceProvider extends ServiceProvider
         Livewire::component('vehicle-search', \App\Http\Livewire\VehicleSearch::class);
         Livewire::component('booking-form', \App\Http\Livewire\BookingForm::class);
         Livewire::component('vehicle-calendar', \App\Http\Livewire\VehicleCalendar::class);
+        Livewire::component('manage-booking', \App\Http\Livewire\ManageBooking::class);
 
         // View composers
         \View::composer('layouts.app', \App\View\Composers\MenuComposer::class);

@@ -6,7 +6,8 @@ use App\Filament\Resources\BookingResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 
-class CreateBooking extends CreateRecord
+class CreateBooking extends \App\Filament\Resources\Pages\BaseCreateRecord
 {
     protected static string $resource = BookingResource::class;
-}
+
+    }

@@ -17,12 +17,14 @@ class VehicleCategory extends Model
         'description',
         'icon',
         'sort_order',
+        'base_price',
         'is_active',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
         'sort_order' => 'integer',
+        'base_price' => 'decimal:2',
     ];
 
     protected static function boot()
@@ -49,37 +51,34 @@ class VehicleCategory extends Model
 
     public function volumeDiscounts(): HasMany
     {
-        return $this->hasMany(CategoryVolumeDiscount::class);
+        return $this->hasMany(CategoryVolumeDiscount::class)->orderBy('min_days');
     }
 
-    /**
-     * Get the base price for a specific date.
-     * Returns the base_price of the active price period that covers the given date.
-     */
     public function getBasePriceForDate(\DateTimeInterface $date): ?float
     {
-        return $this->pricePeriods()
-            ->where(function ($query) use ($date) {
-                $query->where('start_date', '<=', $date->format('Y-m-d'))
-                    ->where('end_date', '>=', $date->format('Y-m-d'));
-            })
+        $periodPrice = $this->pricePeriods()
+            ->where('active', true)
+            ->where('start_date', '<=', $date->format('Y-m-d'))
+            ->where('end_date', '>=', $date->format('Y-m-d'))
             ->value('base_price');
+
+        return $periodPrice ?? $this->base_price;
     }
 
-    /**
-     * Get the applicable discount percentage for a given number of days.
-     */
+    public function getCurrentBasePrice(): ?float
+    {
+        return $this->getBasePriceForDate(now());
+    }
+
     public function getDiscountForDays(int $days): float
     {
         $discount = $this->volumeDiscounts()
+            ->where('min_days', '<=', $days)
             ->where(function ($query) use ($days) {
-                $query->where('min_days', '<=', $days)
-                    ->where(function ($q) use ($days) {
-                        $q->whereNull('max_days')
-                          ->orWhere('max_days', '>=', $days);
-                    });
+                $query->whereNull('max_days')
+                      ->orWhere('max_days', '>=', $days);
             })
-            ->orderBy('min_days', 'desc')
+            ->orderByDesc('min_days')
             ->first();
 
         return $discount ? (float) $discount->discount_percent : 0;

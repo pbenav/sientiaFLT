@@ -1,191 +1,130 @@
 <div>
     @if(session('message'))
-        <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-6">
-            <div class="flex items-center">
-                <svg class="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                </svg>
-                {{ session('message') }}
-            </div>
+        <div style="background: #ecfdf5; border: 1px solid #a7f3d0; color: #047857; padding: 16px; border-radius: 8px; margin-bottom: 24px; font-weight: 500;">
+            {{ session('message') }}
         </div>
     @endif
 
     @if(session('error'))
-        <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+        <div style="background: #fef2f2; border: 1px solid #fecaca; color: #b91c1c; padding: 16px; border-radius: 8px; margin-bottom: 24px; font-weight: 500;">
             {{ session('error') }}
         </div>
     @endif
 
-    <div class="max-w-4xl mx-auto">
-        <!-- Header -->
-        <div class="mb-8">
-            <a href="/" class="text-blue-600 hover:text-blue-800 text-sm font-medium mb-4 inline-block flex items-center">
-                <svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                </svg>
-                Back to Home
-            </a>
-            <h2 class="text-2xl font-bold text-gray-900">Book a Vehicle</h2>
+    <div style="background: #ffffff; border-radius: 16px; padding: 40px; box-shadow: 0 4px 24px rgba(0,0,0,0.08);">
+        
+        <!-- Detailed Summary -->
+        <div style="background: #f8fafc; border-radius: 12px; padding: 20px; margin-bottom: 30px; border: 1px solid #e2e8f0;">
             @if($vehicle)
-                <p class="text-gray-500 mt-1">{{ $vehicle->brand }} {{ $vehicle->model }} ({{ $vehicle->year }})</p>
-            @endif
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Form -->
-            <div class="lg:col-span-2">
-                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                    <form wire:submit.prevent="submit" class="space-y-6">
-                        <!-- Vehicle Selection -->
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Vehicle</label>
-                            <select wire:model="vehicle_id" class="select-field" wire:change="calculatePrice">
-                                <option value="">Select a vehicle</option>
-                                @php
-                                    $vehicles = \App\Models\Vehicle::active()->available()->get();
-                                @endphp
-                                @foreach($vehicles as $v)
-                                    <option value="{{ $v->id }}">{{ $v->name }} - €{{ number_format($v->daily_rate, 2) }}/day</option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <!-- Dates -->
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-1.5">Pick-up Date</label>
-                                <input type="date" wire:model="start_date" min="{{ date('Y-m-d') }}" class="input-field" wire:change="calculatePrice">
-                                @error('start_date') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
-                            </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-1.5">Return Date</label>
-                                <input type="date" wire:model="end_date" min="{{ $start_date ?? date('Y-m-d') }}" class="input-field" wire:change="calculatePrice">
-                                @error('end_date') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
-                            </div>
-                        </div>
-
-                        <!-- Customer Selection -->
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Customer</label>
-                            <select wire:model="customer_id" class="select-field">
-                                <option value="">Select customer</option>
-                                @foreach($customers as $customer)
-                                    <option value="{{ $customer->id }}">{{ $customer->full_name }} @if($customer->company_name)({{ $customer->company_name }})@endif</option>
-                                @endforeach
-                            </select>
-                            @error('customer_id') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
-                        </div>
-
-                        <!-- Extras -->
-                        <div>
-                            <h3 class="text-lg font-bold text-gray-900 mb-3">Add-ons & Extras</h3>
-                            <div class="space-y-3">
-                                @foreach($extras as $extra)
-                                <label class="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
-                                    <div class="flex items-center">
-                                        <input type="checkbox" value="{{ $extra->id }}" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-4 w-4" wire:model="extras">
-                                        <span class="ml-3 text-sm text-gray-700">{{ $extra->name }}</span>
-                                        @if($extra->description)
-                                            <span class="ml-2 text-xs text-gray-400">- {{ $extra->description }}</span>
-                                        @endif
-                                    </div>
-                                    <span class="text-sm font-semibold text-blue-600">+€{{ number_format($extra->price, 2) }}{{ $extra->calculation_type === 'per_day' ? '/day' : '' }}</span>
-                                </label>
-                                @endforeach
-                            </div>
-                        </div>
-
-                        <!-- Special Requests -->
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Special Requests</label>
-                            <textarea class="input-field" rows="3" placeholder="Any special requirements..."></textarea>
-                        </div>
-
-                        <!-- Submit -->
-                        <div class="flex justify-end pt-4">
-                            <button type="submit" class="btn-secondary text-white px-8 py-3 rounded-lg font-semibold flex items-center">
-                                <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                                Confirm Booking
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Price Summary Sidebar -->
-            <div class="lg:col-span-1">
-                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 sticky top-20">
-                    <h3 class="text-lg font-bold text-gray-900 mb-4">Price Summary</h3>
-
-                    @if($duration_days > 0)
-                        <div class="space-y-3">
-                            <div class="flex justify-between text-sm">
-                                <span class="text-gray-500">Duration</span>
-                                <span class="font-medium">{{ $duration_days }} day{{ $duration_days > 1 ? 's' : '' }}</span>
-                            </div>
-
-                            <div class="flex justify-between text-sm">
-                                <span class="text-gray-500">Base price</span>
-                                <span class="font-medium">€{{ number_format($subtotal, 2) }}</span>
-                            </div>
-
-                            @if($tax_amount > 0)
-                            <div class="flex justify-between text-sm">
-                                <span class="text-gray-500">Tax</span>
-                                <span class="font-medium">€{{ number_format($tax_amount, 2) }}</span>
-                            </div>
-                            @endif
-
-                            <div class="border-t border-gray-200 pt-3">
-                                <div class="flex justify-between">
-                                    <span class="text-lg font-bold text-gray-900">Total</span>
-                                    <span class="text-2xl font-bold text-blue-600">€{{ number_format($total_price, 2) }}</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mt-4 p-3 bg-blue-50 rounded-lg">
-                            <p class="text-xs text-blue-700">
-                                <svg class="inline h-3 w-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
-                                </svg>
-                                Free cancellation up to 48 hours before pick-up
-                            </p>
-                        </div>
-                    @else
-                        <div class="text-center py-8 text-gray-400">
-                            <svg class="h-12 w-12 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
-                            </svg>
-                            <p class="text-sm">Select dates to see pricing</p>
-                        </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 15px; margin-bottom: 15px;">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    @if($vehicle->primaryImage && $vehicle->primaryImage->url)
+                        <img src="{{ $vehicle->primaryImage->url }}" alt="{{ $vehicle->name }}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;">
                     @endif
-
-                    <!-- Trust badges -->
-                    <div class="mt-6 pt-4 border-t border-gray-100 space-y-3">
-                        <div class="flex items-center text-xs text-gray-500">
-                            <svg class="h-4 w-4 mr-2 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
-                            </svg>
-                            Secure payment
-                        </div>
-                        <div class="flex items-center text-xs text-gray-500">
-                            <svg class="h-4 w-4 mr-2 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                            </svg>
-                            No hidden fees
-                        </div>
-                        <div class="flex items-center text-xs text-gray-500">
-                            <svg class="h-4 w-4 mr-2 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                            </svg>
-                            Full insurance included
-                        </div>
+                    <div>
+                        <h3 style="font-weight: 700; color: #161829; font-size: 18px; margin: 0;">{{ $vehicle->name }}</h3>
+                        <p style="color: #64748b; font-size: 13px; margin: 0;">{{ $vehicle->brand }} {{ $vehicle->model }}</p>
                     </div>
                 </div>
             </div>
+            @endif
+
+            <!-- Fechas -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 15px;">
+                <div>
+                    <label style="display: block; color: #374151; font-size: 12px; font-weight: 700; text-transform: uppercase; margin-bottom: 5px;">{{ __('Recogida') }}</label>
+                    <input type="date" wire:model.live="start_date" style="width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; background: #ffffff;" min="{{ date('Y-m-d') }}">
+                    @error('start_date') <span style="color: #ef4444; font-size: 12px; margin-top: 4px; display: block;">{{ $message }}</span> @enderror
+                </div>
+                <div>
+                    <label style="display: block; color: #374151; font-size: 12px; font-weight: 700; text-transform: uppercase; margin-bottom: 5px;">{{ __('Devolución') }}</label>
+                    <input type="date" wire:model.live="end_date" style="width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; background: #ffffff;" min="{{ $start_date ?? date('Y-m-d') }}">
+                    @error('end_date') <span style="color: #ef4444; font-size: 12px; margin-top: 4px; display: block;">{{ $message }}</span> @enderror
+                </div>
+            </div>
+
+            <!-- Precios Desglosados -->
+            @if($duration_days > 0)
+            <div style="background: #ffffff; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; color: #475569;">
+                    <span>{{ __('Tarifa Base') }} ({{ $duration_days }} {{ $duration_days == 1 ? __('día') : __('días') }})</span>
+                    <span>€{{ number_format($base_price, 2) }}</span>
+                </div>
+                @if($discount > 0)
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; color: #10b981; font-weight: 600;">
+                    <span>{{ __('Descuentos') }}</span>
+                    <span>-€{{ number_format($discount, 2) }}</span>
+                </div>
+                @endif
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; color: #475569; border-top: 1px dashed #e2e8f0; padding-top: 8px;">
+                    <span>{{ __('Subtotal') }}</span>
+                    <span>€{{ number_format($subtotal, 2) }}</span>
+                </div>
+                @if($tax_amount > 0)
+                <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; color: #475569;">
+                    <span>{{ $tax_name }}</span>
+                    <span>€{{ number_format($tax_amount, 2) }}</span>
+                </div>
+                @endif
+                <div style="display: flex; justify-content: space-between; border-top: 1px solid #e2e8f0; padding-top: 12px;">
+                    <span style="font-size: 16px; font-weight: 700; color: #161829;">{{ __('Total a Pagar') }}</span>
+                    <span style="font-size: 24px; font-weight: 800; color: #EA001E; font-family: 'Space Grotesk', sans-serif;">€{{ number_format($total_price, 2) }}</span>
+                </div>
+            </div>
+            @endif
         </div>
+
+        <h2 style="font-size: 20px; font-weight: 700; color: #161829; margin-bottom: 24px;">{{ __('Tus Datos Personales') }}</h2>
+
+        <form wire:submit.prevent="submit" style="display: grid; gap: 24px;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                <div>
+                    <label style="display: block; color: #374151; font-size: 14px; font-weight: 600; margin-bottom: 8px;">{{ __('Nombre') }} <span style="color: #EA001E;">*</span></label>
+                    <input type="text" wire:model.defer="first_name" required style="width: 100%; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 15px; color: #374151; background: #f9fafb;">
+                </div>
+                <div>
+                    <label style="display: block; color: #374151; font-size: 14px; font-weight: 600; margin-bottom: 8px;">{{ __('Apellidos') }} <span style="color: #EA001E;">*</span></label>
+                    <input type="text" wire:model.defer="last_name" required style="width: 100%; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 15px; color: #374151; background: #f9fafb;">
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                <div>
+                    <label style="display: block; color: #374151; font-size: 14px; font-weight: 600; margin-bottom: 8px;">{{ __('Email') }} <span style="color: #EA001E;">*</span></label>
+                    <input type="email" wire:model.defer="email" required style="width: 100%; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 15px; color: #374151; background: #f9fafb;">
+                </div>
+                <div>
+                    <label style="display: block; color: #374151; font-size: 14px; font-weight: 600; margin-bottom: 8px;">{{ __('Teléfono') }} <span style="color: #EA001E;">*</span></label>
+                    <input type="text" wire:model.defer="phone" required style="width: 100%; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 15px; color: #374151; background: #f9fafb;">
+                </div>
+            </div>
+
+            <div>
+                <label style="display: block; color: #374151; font-size: 14px; font-weight: 600; margin-bottom: 8px;">{{ __('DNI / NIE / Pasaporte') }} <span style="color: #EA001E;">*</span></label>
+                <input type="text" wire:model.defer="nif" required style="width: 100%; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 15px; color: #374151; background: #f9fafb;">
+            </div>
+
+            <div style="text-align: center; margin-top: 10px;">
+                <button type="submit" class="ex-btn ex-btn-primary" style="width: 100%; padding: 16px 48px; border-radius: 10px; font-weight: 700; font-size: 17px; cursor: pointer; border: none;">
+                    <span wire:loading.remove wire:target="submit">{{ __('Confirmar y Reservar') }}</span>
+                    <span wire:loading wire:target="submit">{{ __('Procesando...') }}</span>
+                </button>
+                <p style="font-size: 12px; color: #94a3b8; margin-top: 12px;">
+                    {{ __('Al hacer clic en "Confirmar", aceptas nuestros') }} <a href="#" style="color: #EA001E; text-decoration: underline;">{{ __('términos y condiciones') }}</a>.
+                    @if($vehicle && $vehicle->security_deposit > 0)
+                        <br>{{ __('Se requerirá una fianza de') }} <strong>€{{ number_format($vehicle->security_deposit, 2) }}</strong> {{ __('al recoger el vehículo.') }}
+                    @endif
+                </p>
+            </div>
+        </form>
+    </div>
+    
+    <div style="margin-top: 30px; text-align: center;">
+        <p style="color: #64748b; font-size: 14px;">
+            <svg style="width: 16px; height: 16px; display: inline; margin-bottom: 2px; color: #10b981;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+            </svg>
+            {{ __('Pago 100% seguro. Sin costes ocultos.') }}
+        </p>
     </div>
 </div>
