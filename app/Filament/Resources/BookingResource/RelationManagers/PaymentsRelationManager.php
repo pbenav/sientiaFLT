@@ -12,35 +12,45 @@ class PaymentsRelationManager extends RelationManager
 {
     protected static string $relationship = 'payments';
 
-    protected static ?string $title = 'Payments';
+    protected static ?string $title = 'Pagos';
+
+    public static function getTitle(\Illuminate\Database\Eloquent\Model $ownerRecord, string $pageClass): string
+    {
+        return __('Pagos');
+    }
 
     public function form(Form $form): Form
     {
         return $form
             ->schema([
                 Forms\Components\Select::make('payment_method')
+                    ->label(__('Método de Pago'))
                     ->required()
                     ->options([
-                        'stripe' => 'Stripe',
-                        'bizum' => 'Bizum',
-                        'paypal' => 'PayPal',
-                        'cash' => 'Cash',
-                        'bank_transfer' => 'Bank Transfer',
+                        'efectivo' => __('Efectivo'),
+                        'tarjeta' => __('Tarjeta de crédito'),
+                        'transferencia' => __('Transferencia bancaria'),
+                        'stripe' => __('Stripe'),
+                        'paypal' => __('PayPal'),
+                        'bizum' => __('Bizum'),
                     ])
                     ->reactive(),
                 Forms\Components\TextInput::make('amount')
+                    ->label(__('Importe'))
                     ->required()
                     ->numeric()
                     ->prefix('€'),
                 Forms\Components\Select::make('status')
+                    ->label(__('Estado'))
                     ->required()
                     ->options([
-                        'pending' => 'Pending',
-                        'completed' => 'Completed',
-                        'failed' => 'Failed',
-                        'refunded' => 'Refunded',
+                        'pending' => __('Pendiente'),
+                        'completed' => __('Completado'),
+                        'failed' => 'Fallido',
+                        'refunded' => 'Reembolsado',
                     ]),
                 Forms\Components\TextInput::make('transaction_id')
+                    ->label(__('ID Transacción'))
                     ->maxLength(255),
             ]);
     }
@@ -50,19 +60,30 @@ class PaymentsRelationManager extends RelationManager
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('payment_method')
+                    ->label(__('Método'))
                     ->badge()
                     ->formatStateUsing(fn ($state) => match ($state) {
+                        'efectivo' => '💵 Efectivo',
+                        'tarjeta' => '💳 Tarjeta',
+                        'transferencia' => '🏦 Transferencia',
                         'stripe' => '💳 Stripe',
                         'bizum' => '📱 Bizum',
                         'paypal' => '🅿️ PayPal',
-                        'cash' => '💵 Cash',
-                        'bank_transfer' => '🏦 Bank Transfer',
                         default => $state,
                     }),
                 Tables\Columns\TextColumn::make('amount')
+                    ->label(__('Importe'))
                     ->money('EUR')
                     ->sortable(),
                 Tables\Columns\BadgeColumn::make('status')
+                    ->label(__('Estado'))
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'pending' => 'Pendiente',
+                        'completed' => 'Completado',
+                        'failed' => 'Fallido',
+                        'refunded' => 'Reembolsado',
+                        default => $state,
+                    })
                     ->colors([
                         'warning' => 'pending',
                         'success' => 'completed',
@@ -70,28 +91,33 @@ class PaymentsRelationManager extends RelationManager
                         'secondary' => 'refunded',
                     ]),
                 Tables\Columns\TextColumn::make('transaction_id')
+                    ->label(__('ID Trans.'))
                     ->copyable()
                     ->copyable(fn ($state) => (bool) $state)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
+                    ->label(__('Fecha'))
+                    ->dateTime('d/m/Y H:i')
                     ->sortable(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('payment_method')
+                    ->label(__('Método de Pago'))
                     ->options([
-                        'stripe' => 'Stripe',
-                        'bizum' => 'Bizum',
-                        'paypal' => 'PayPal',
-                        'cash' => 'Cash',
-                        'bank_transfer' => 'Bank Transfer',
+                        'efectivo' => __('Efectivo'),
+                        'tarjeta' => __('Tarjeta de crédito'),
+                        'transferencia' => __('Transferencia bancaria'),
+                        'stripe' => __('Stripe'),
+                        'paypal' => __('PayPal'),
+                        'bizum' => __('Bizum'),
                     ]),
                 Tables\Filters\SelectFilter::make('status')
+                    ->label(__('Estado'))
                     ->options([
-                        'pending' => 'Pending',
-                        'completed' => 'Completed',
-                        'failed' => 'Failed',
-                        'refunded' => 'Refunded',
+                        'pending' => __('Pendiente'),
+                        'completed' => __('Completado'),
+                        'failed' => __('Fallido'),
+                        'refunded' => __('Reembolsado'),
                     ]),
             ])
             ->headerActions([

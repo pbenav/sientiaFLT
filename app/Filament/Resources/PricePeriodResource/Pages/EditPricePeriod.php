@@ -16,4 +16,9 @@ class EditPricePeriod extends \App\Filament\Resources\Pages\BaseEditRecord
             Actions\DeleteAction::make(),
         ];
     }
+
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
 }

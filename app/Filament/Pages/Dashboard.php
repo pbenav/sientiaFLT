@@ -35,6 +35,8 @@ class Dashboard extends BaseDashboard
             \App\Filament\Widgets\RevenueChartWidget::class,
             \App\Filament\Widgets\BookingStatusChartWidget::class,
             \App\Filament\Widgets\VehicleTypeChartWidget::class,
+            \App\Filament\Widgets\POSStatsWidget::class,
+            \App\Filament\Widgets\RecentBookingsWidget::class,
         ];
     }
 }

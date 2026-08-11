@@ -85,9 +85,19 @@ class Vehicle extends Model
         return $this->belongsTo(Location::class);
     }
 
-    public function images(): HasMany
+    public function images()
     {
-        return $this->hasMany(VehicleImage::class);
+        return $this->hasMany(VehicleImage::class)->orderBy('sort_order');
+    }
+
+    public function units()
+    {
+        return $this->hasMany(VehicleUnit::class);
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
     }
 
     public function primaryImage(): \Illuminate\Database\Eloquent\Relations\HasOne

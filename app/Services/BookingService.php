@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Models\Booking;
-use App\Models\BookingService;
+use App\Models\BookingService as BookingServiceModel;
 use App\Models\Payment;
 use App\Models\Vehicle;
 use Carbon\Carbon;
@@ -68,7 +68,7 @@ class BookingService implements \App\Interfaces\BookingServiceInterface
 
             if (isset($data['services'])) {
                 foreach ($data['services'] as $serviceData) {
-                    BookingService::create([
+                    BookingServiceModel::create([
                         'booking_id' => $booking->id,
                         'service_type' => $serviceData['type'] ?? 'extra',
                         'name' => $serviceData['name'] ?? '',

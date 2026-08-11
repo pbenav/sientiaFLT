@@ -10,4 +10,9 @@ class CreateVehicleCategory extends \App\Filament\Resources\Pages\BaseCreateReco
 {
     protected static string $resource = VehicleCategoryResource::class;
 
+    
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
     }
+}

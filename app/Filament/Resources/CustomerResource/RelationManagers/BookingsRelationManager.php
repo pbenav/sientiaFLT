@@ -53,6 +53,14 @@ class BookingsRelationManager extends RelationManager
                     ->date()
                     ->sortable(),
                 Tables\Columns\BadgeColumn::make('status')
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'pending' => 'Pendiente',
+                        'confirmed' => 'Confirmada',
+                        'active' => 'Activa',
+                        'completed' => 'Completada',
+                        'cancelled' => 'Cancelada',
+                        default => $state,
+                    })
                     ->colors([
                         'warning' => 'pending',
                         'success' => 'confirmed',

@@ -17,4 +17,9 @@ class EditCustomer extends \App\Filament\Resources\Pages\BaseEditRecord
         ];
     }
 
+    
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
     }
+}

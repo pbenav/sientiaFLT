@@ -20,9 +20,14 @@
                     <p class="text-lg text-gray-600 mb-10">{{ __('Gracias por confiar en nosotros') }}, <strong>{{ $booking->customer->first_name }}</strong>.</p>
                     
                     <!-- Ticket de Localizador -->
-                    <div class="relative bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl p-8 mb-10">
-                        <p class="text-xs text-gray-400 uppercase tracking-widest font-bold mb-2">{{ __('Tu Localizador') }}</p>
-                        <p class="text-4xl font-bold text-ex-primary tracking-wider" style="font-family: 'Space Grotesk', sans-serif;">{{ $booking->booking_number }}</p>
+                    <div class="relative bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl p-8 mb-10 flex flex-col md:flex-row items-center justify-between gap-6">
+                        <div class="text-center md:text-left flex-1">
+                            <p class="text-xs text-gray-400 uppercase tracking-widest font-bold mb-2">{{ __('Tu Localizador') }}</p>
+                            <p class="text-3xl md:text-4xl font-bold text-ex-primary tracking-wider" style="font-family: 'Space Grotesk', sans-serif;">{{ $booking->booking_number }}</p>
+                        </div>
+                        <div class="flex-shrink-0 bg-white p-2 rounded-xl border border-gray-200 shadow-sm transition-transform hover:scale-105 cursor-pointer" title="Escanea para gestionar tu reserva">
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data={{ urlencode(url('/mis-reservas')) }}" alt="QR Code" class="w-20 h-20 md:w-24 md:h-24">
+                        </div>
                         
                         <!-- Puntas recortadas estilo ticket -->
                         <div class="absolute -left-4 top-1/2 transform -translate-y-1/2 w-8 h-8 bg-white rounded-full border-r-2 border-gray-300" style="clip-path: inset(0 0 0 50%);"></div>
@@ -49,9 +54,17 @@
                         <strong class="text-gray-800">{{ $booking->customer->email }}</strong>
                     </p>
                     
-                    <a href="/" class="ex-btn border-2 border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white transition-colors duration-300 px-8 py-3">
-                        {{ __('Volver al Inicio') }}
-                    </a>
+                    <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
+                        <button onclick="window.print()" class="ex-btn border-2 border-gray-900 bg-gray-900 text-white hover:bg-gray-800 transition-colors duration-300 px-8 py-3 flex items-center gap-2 justify-center w-full sm:w-auto">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                            </svg>
+                            {{ __('Imprimir Ticket') }}
+                        </button>
+                        <a href="/" class="ex-btn border-2 border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors duration-300 px-8 py-3 w-full sm:w-auto">
+                            {{ __('Volver al Inicio') }}
+                        </a>
+                    </div>
                 </div>
             </div>
             

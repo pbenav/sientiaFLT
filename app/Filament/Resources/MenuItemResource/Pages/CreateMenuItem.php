@@ -10,4 +10,9 @@ class CreateMenuItem extends \App\Filament\Resources\Pages\BaseCreateRecord
 {
     protected static string $resource = MenuItemResource::class;
 
+    
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
     }
+}

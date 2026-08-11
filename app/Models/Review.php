@@ -12,13 +12,14 @@ class Review extends Model
 
     protected $fillable = [
         'booking_id', 'customer_id', 'vehicle_id', 'rating',
-        'title', 'comment', 'is_approved', 'is_visible',
+        'title', 'comment', 'is_approved', 'is_visible', 'images',
     ];
 
     protected $casts = [
         'rating' => 'integer',
         'is_approved' => 'boolean',
         'is_visible' => 'boolean',
+        'images' => 'array',
     ];
 
     public function booking(): BelongsTo

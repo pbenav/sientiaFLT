@@ -10,4 +10,9 @@ class CreatePricePeriod extends \App\Filament\Resources\Pages\BaseCreateRecord
 {
     protected static string $resource = PricePeriodResource::class;
 
+    
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
     }
+}

@@ -10,4 +10,9 @@ class CreateCustomer extends \App\Filament\Resources\Pages\BaseCreateRecord
 {
     protected static string $resource = CustomerResource::class;
 
+    
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
     }
+}

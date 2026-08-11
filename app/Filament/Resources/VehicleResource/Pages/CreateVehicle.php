@@ -10,4 +10,9 @@ class CreateVehicle extends \App\Filament\Resources\Pages\BaseCreateRecord
 {
     protected static string $resource = VehicleResource::class;
 
+    
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
     }
+}

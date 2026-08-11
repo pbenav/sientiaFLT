@@ -6,6 +6,17 @@ use App\Http\Controllers\SearchResultsController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\PDFController;
+use App\Http\Controllers\AutoFirmaController;
+
+// PDF Routes
+Route::get('/pdf/factura/{invoice}', [PDFController::class, 'factura'])->name('pdf.factura');
+Route::get('/pdf/ticket/{booking}', [PDFController::class, 'ticket'])->name('pdf.ticket');
+Route::get('/pdf/contract/{booking}', [PDFController::class, 'contract'])->name('pdf.contract');
+
+// AutoFirma Routes
+Route::get('/autofirma/sign/{invoice}', [AutoFirmaController::class, 'showSignPage'])->name('autofirma.sign')->middleware('auth');
+Route::post('/autofirma/save/{invoice}', [AutoFirmaController::class, 'saveSignature'])->name('autofirma.save')->middleware('auth');
 
 Route::get('/', WelcomeController::class)->name('home');
 

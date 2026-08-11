@@ -28,13 +28,13 @@ class PricingService implements \App\Interfaces\PricingServiceInterface
             $discount += $basePrice * ($volumeDiscountPercent / 100);
         }
         
-        $subtotal = $basePrice - $discount;
+        $extraPrice = $this->calculateExtras($extras, $days);
+        $subtotal = $basePrice - $discount + $extraPrice;
         $defaultTax = \App\Models\Tax::where('is_default', true)->where('is_active', true)->first();
-        $taxRate = $defaultTax ? (float) $defaultTax->rate : config('extrarent.tax_rate', 21);
+        $taxRate = $defaultTax ? (float) $defaultTax->rate : (float) \App\Models\Setting::get('default_tax_rate', 21);
         $taxName = $defaultTax ? $defaultTax->name : 'IVA (' . $taxRate . '%)';
         $taxAmount = $subtotal * ($taxRate / 100);
-        $extraPrice = $this->calculateExtras($extras, $days);
-        $total = $subtotal + $taxAmount + $extraPrice;
+        $total = $subtotal + $taxAmount;
 
         return [
             'base_price' => round($basePrice, 2),

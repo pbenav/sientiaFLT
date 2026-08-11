@@ -5,6 +5,8 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\VehicleResource\Pages;
 use App\Filament\Resources\VehicleResource\RelationManagers\BookingsRelationManager;
 use App\Filament\Resources\VehicleResource\RelationManagers\VehicleImagesRelationManager;
+use App\Filament\Resources\VehicleResource\RelationManagers\ReviewsRelationManager;
+use App\Filament\Resources\VehicleResource\RelationManagers\UnitsRelationManager;
 use App\Models\Vehicle;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -349,7 +351,9 @@ class VehicleResource extends Resource
     {
         return [
             BookingsRelationManager::class,
+            ReviewsRelationManager::class,
             VehicleImagesRelationManager::class,
+            UnitsRelationManager::class,
         ];
     }
 

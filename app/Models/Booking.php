@@ -15,7 +15,7 @@ class Booking extends Model
 
     protected $fillable = [
         'customer_id', 'erp_documento_id', 'booking_number', 'vehicle_id',
-        'location_id', 'start_date', 'end_date', 'start_location',
+        'vehicle_unit_id', 'location_id', 'start_date', 'end_date', 'start_location',
         'end_location', 'return_location', 'is_round_trip', 'driver_age',
         'has_additional_driver', 'status', 'payment_status',
         'subtotal', 'tax_amount', 'total_amount', 'amount_paid',
@@ -23,7 +23,9 @@ class Booking extends Model
         'special_requests', 'customer_notes', 'internal_notes', 'notes',
         'booking_source', 'utm_source', 'utm_medium', 'utm_campaign',
         'referral_code', 'is_confirmed', 'is_paid', 'is_active',
-        'erp_sync_status', 'erp_sync_data',
+        'erp_sync_status', 'erp_sync_data', 'tpv_ticket_id', 'alquiler_id',
+        'pos_session_id', 'user_id', 'payment_method_id', 'fecha_entrega',
+        'fecha_devolucion', 'discount_amount',
     ];
 
     protected $casts = [
@@ -61,6 +63,16 @@ class Booking extends Model
         return $this->belongsTo(Vehicle::class);
     }
 
+    public function unit(): BelongsTo
+    {
+        return $this->belongsTo(VehicleUnit::class, 'vehicle_unit_id');
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function location(): BelongsTo
     {
         return $this->belongsTo(Location::class);
@@ -84,6 +96,16 @@ class Booking extends Model
     public function review(): HasOne
     {
         return $this->hasOne(Review::class);
+    }
+
+    public function tpvTicket(): BelongsTo
+    {
+        return $this->belongsTo(TicketTPV::class, 'tpv_ticket_id');
+    }
+
+    public function alquiler(): BelongsTo
+    {
+        return $this->belongsTo(Alquiler::class, 'alquiler_id');
     }
 
     public function reviews(): HasMany

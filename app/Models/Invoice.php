@@ -11,7 +11,7 @@ class Invoice extends Model
     use HasFactory;
 
     protected $fillable = [
-        'booking_id', 'customer_id', 'invoice_number', 'erp_document_id',
+        'booking_id', 'alquiler_id', 'tpv_ticket_id', 'customer_id', 'invoice_number', 'erp_document_id',
         'type', 'issue_date', 'due_date', 'subtotal', 'tax_amount',
         'total_amount', 'currency_code', 'status', 'notes', 'pdf_path',
         'erp_sync_status',
@@ -33,5 +33,15 @@ class Invoice extends Model
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
+    }
+
+    public function alquiler(): BelongsTo
+    {
+        return $this->belongsTo(Alquiler::class);
+    }
+
+    public function tpvTicket(): BelongsTo
+    {
+        return $this->belongsTo(TicketTPV::class, 'tpv_ticket_id');
     }
 }

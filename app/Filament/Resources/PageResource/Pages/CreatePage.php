@@ -10,4 +10,9 @@ class CreatePage extends \App\Filament\Resources\Pages\BaseCreateRecord
 {
     protected static string $resource = PageResource::class;
 
+    
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
     }
+}

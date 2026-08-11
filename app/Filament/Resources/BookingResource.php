@@ -25,7 +25,12 @@ class BookingResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-calendar';
 
-    protected static ?string $navigationGroup = 'Operations';
+    protected static ?string $navigationGroup = 'Operaciones';
+
+    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        return $record->invoice === null;
+    }
 
     public static function form(Form $form): Form
     {
@@ -63,12 +68,19 @@ class BookingResource extends Resource
                                 return '-';
                             }),
                         Forms\Components\Select::make('vehicle_id')
-                            ->label(__('Vehículo'))
-                            ->options(Vehicle::where('is_active', true)->orderBy('name')->get()->pluck('name', 'id'))
-                            ->searchable()
+                            ->relationship('vehicle', 'name')
+                            ->label('Categoría Vehículo')
                             ->required()
                             ->live()
-                            ->afterStateUpdated($updateTotals),
+                            ->afterStateUpdated(function (callable $set) {
+                                $set('vehicle_unit_id', null);
+                            }),
+                        Forms\Components\Select::make('vehicle_unit_id')
+                            ->label('Unidad Física (Matrícula)')
+                            ->relationship('unit', 'license_plate', fn ($query, callable $get) => $query->where('vehicle_id', $get('vehicle_id')))
+                            ->placeholder('Selecciona unidad')
+                            ->searchable()
+                            ->preload(),
                         Forms\Components\Select::make('location_id')
                             ->label(__('Lugar de Recogida/Devolución'))
                             ->options(Location::orderBy('name')->get()->pluck('name', 'id'))
@@ -175,6 +187,18 @@ class BookingResource extends Resource
                             ->maxLength(1000)
                             ->rows(3),
                     ]),
+
+                Forms\Components\Section::make(__('Detalles de Pago TPV'))
+                    ->schema([
+                        Forms\Components\Placeholder::make('pos_session')
+                            ->label(__('Sesión TPV'))
+                            ->content(fn ($record) => $record?->pos_session_id ?? 'No procedente de TPV'),
+                        Forms\Components\Placeholder::make('invoice_number')
+                            ->label(__('Número de Factura'))
+                            ->content(fn ($record) => $record?->invoice?->invoice_number ?? 'Sin factura generada'),
+                    ])
+                    ->columns(2)
+                    ->visible(fn ($record) => $record !== null && $record->pos_session_id !== null),
             ]);
     }
 
@@ -212,6 +236,14 @@ class BookingResource extends Resource
                     ->sortable(),
                 Tables\Columns\BadgeColumn::make('status')
                     ->label(__('Estado'))
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'pending' => 'Pendiente',
+                        'confirmed' => 'Confirmada',
+                        'active' => 'Activa',
+                        'completed' => 'Completada',
+                        'cancelled' => 'Cancelada',
+                        default => $state,
+                    })
                     ->colors([
                         'warning' => 'pending',
                         'success' => 'confirmed',
@@ -221,6 +253,13 @@ class BookingResource extends Resource
                     ]),
                 Tables\Columns\BadgeColumn::make('payment_status')
                     ->label(__('Pago'))
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'unpaid' => 'Pendiente',
+                        'partial' => 'Parcial',
+                        'paid' => 'Pagado',
+                        'refunded' => 'Reembolsado',
+                        default => $state,
+                    })
                     ->colors([
                         'danger' => 'unpaid',
                         'warning' => 'partial',
@@ -275,11 +314,63 @@ class BookingResource extends Resource
                     ->label(__('Reservas hasta')),
             ])
             ->actions([
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make(),
                     Tables\Actions\ViewAction::make(),
+                    Tables\Actions\Action::make('generate_invoice')
+                        ->label(__('Generar Factura'))
+                        ->icon('heroicon-o-document-plus')
+                        ->action(function (Booking $record) {
+                            if ($record->invoice) {
+                                \Filament\Notifications\Notification::make()
+                                    ->title('La reserva ya tiene factura')
+                                    ->warning()
+                                    ->send();
+                                return;
+                            }
+                            
+                            $year = now()->format('Y');
+                            $lastInvoice = \App\Models\Invoice::where('invoice_number', 'like', "F-{$year}-%")->orderBy('invoice_number', 'desc')->first();
+                            $nextSequence = $lastInvoice ? intval(substr($lastInvoice->invoice_number, -5)) + 1 : 1;
+                            $invoiceNumber = sprintf("F-%s-%05d", $year, $nextSequence);
+
+                            $invoice = \App\Models\Invoice::create([
+                                'booking_id' => $record->id,
+                                'customer_id' => $record->customer_id,
+                                'invoice_number' => $invoiceNumber,
+                                'type' => 'factura',
+                                'issue_date' => now(),
+                                'due_date' => now(),
+                                'subtotal' => $record->subtotal,
+                                'tax_amount' => $record->tax_amount,
+                                'total_amount' => $record->total_amount,
+                                'currency_code' => $record->currency_code ?? 'EUR',
+                                'status' => $record->payment_status === 'paid' ? 'paid' : 'draft',
+                            ]);
+                            
+                            // Automatización de firma
+                            \App\Jobs\SignAndSendInvoiceJob::dispatch($invoice);
+                            
+                            \Filament\Notifications\Notification::make()
+                                ->title('Factura generada con éxito')
+                                ->success()
+                                ->send();
+                        })
+                        ->visible(fn (Booking $record) => $record->invoice === null)
+                        ->requiresConfirmation()
+                        ->modalHeading('Generar Factura Definitiva')
+                        ->modalDescription('ATENCIÓN: Al generar la factura se le asignará un número correlativo oficial y definitivo. Una vez generada, por imperativo legal (AEAT/VeriFactu), NI LA FACTURA NI LA RESERVA ASOCIADA PODRÁN SER MODIFICADAS. ¿Estás absolutamente seguro de emitir esta factura ahora?'),
+                    Tables\Actions\Action::make('print_ticket')
+                        ->label(__('Imprimir Ticket'))
+                        ->icon('heroicon-o-receipt-refund')
+                        ->url(fn (Booking $record) => route('pdf.ticket', ['booking' => $record]))
+                        ->openUrlInNewTab(),
+                    Tables\Actions\Action::make('print_factura')
+                        ->label(__('Imprimir Factura'))
+                        ->icon('heroicon-o-document-text')
+                        ->url(fn (Booking $record) => route('pdf.factura', ['invoice' => $record->invoice->id]))
+                        ->visible(fn (Booking $record) => $record->invoice !== null)
+                        ->openUrlInNewTab(),
                     Tables\Actions\DeleteAction::make(),
-                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

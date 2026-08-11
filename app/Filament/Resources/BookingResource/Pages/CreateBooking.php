@@ -10,4 +10,9 @@ class CreateBooking extends \App\Filament\Resources\Pages\BaseCreateRecord
 {
     protected static string $resource = BookingResource::class;
 
+    
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
     }
+}

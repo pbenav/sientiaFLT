@@ -42,4 +42,24 @@ class Customer extends Model
     {
         return $this->full_name;
     }
+
+    public function getNombreAttribute(): string
+    {
+        return $this->first_name;
+    }
+
+    public function getApellidosAttribute(): string
+    {
+        return $this->last_name;
+    }
+
+    public function getTelefonoAttribute(): string
+    {
+        return $this->phone ?? '';
+    }
+
+    public function getDireccionAttribute(): string
+    {
+        return $this->address ?? '';
+    }
 }

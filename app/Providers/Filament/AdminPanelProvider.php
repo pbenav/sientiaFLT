@@ -18,7 +18,11 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
+use Filament\Navigation\NavigationGroup;
 use Filament\Navigation\NavigationItem;
+use Filament\Support\Enums\MaxWidth;
+use Filament\View\PanelsRenderHook;
+use Illuminate\Support\HtmlString;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -29,6 +33,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->maxContentWidth(MaxWidth::Full)
             ->colors([
                 'primary' => Color::Amber,
             ])
@@ -36,6 +41,7 @@ class AdminPanelProvider extends PanelProvider
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
                 \App\Filament\Pages\Dashboard::class,
+                \App\Filament\Pages\POS::class,
             ])
             ->navigationItems([
                 NavigationItem::make('Ver Web')
@@ -43,6 +49,18 @@ class AdminPanelProvider extends PanelProvider
                     ->icon('heroicon-o-globe-alt')
                     ->sort(-1)
                     ->openUrlInNewTab(),
+            ])
+            ->navigationGroups([
+                NavigationGroup::make()
+                    ->label('Operaciones'),
+                NavigationGroup::make()
+                    ->label('Vehículos'),
+                NavigationGroup::make()
+                    ->label('Contenido'),
+                NavigationGroup::make()
+                    ->label('Marketing & SEO'),
+                NavigationGroup::make()
+                    ->label('Configuración'),
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
@@ -62,6 +80,19 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ]);
+            ])
+            ->renderHook(
+                PanelsRenderHook::BODY_END,
+                fn () => new HtmlString("
+                    <script>
+                        document.addEventListener('keydown', function(e) {
+                            if (e.key === 'F2') {
+                                e.preventDefault();
+                                window.location.href = '/admin/pos';
+                            }
+                        });
+                    </script>
+                ")
+            );
     }
 }
