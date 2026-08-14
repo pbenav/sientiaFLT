@@ -574,7 +574,7 @@ h6 { font-size: 1rem; }
     border-radius: 8px;
     padding: 30px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-    margin-top: -50px;
+    margin-top: 40px;
     position: relative;
     z-index: 10;
 }

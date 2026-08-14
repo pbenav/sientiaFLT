@@ -23,10 +23,14 @@ class UnitsRelationManager extends RelationManager
                 Forms\Components\TextInput::make('license_plate')
                     ->label('Matrícula')
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->extraInputAttributes(['style' => 'text-transform: uppercase'])
+                    ->dehydrateStateUsing(fn ($state) => $state ? strtoupper($state) : null),
                 Forms\Components\TextInput::make('vin')
                     ->label('Nº Bastidor')
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->extraInputAttributes(['style' => 'text-transform: uppercase'])
+                    ->dehydrateStateUsing(fn ($state) => $state ? strtoupper($state) : null),
                 Forms\Components\TextInput::make('color')
                     ->label('Color')
                     ->maxLength(255),
@@ -40,6 +44,17 @@ class UnitsRelationManager extends RelationManager
                     ])
                     ->default('active')
                     ->required(),
+                Forms\Components\DatePicker::make('purchase_date')
+                    ->label('Fecha Compra'),
+                Forms\Components\TextInput::make('purchase_price')
+                    ->label('Precio Compra (€)')
+                    ->numeric()
+                    ->prefix('€'),
+                Forms\Components\TextInput::make('current_km')
+                    ->label('Kilometraje Actual')
+                    ->numeric()
+                    ->suffix('km')
+                    ->default(0),
                 Forms\Components\TagsInput::make('extras')
                     ->label('Equipamiento Extra Físico')
                     ->placeholder('Añadir accesorio (ej: Baúl)'),

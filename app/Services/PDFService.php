@@ -28,7 +28,7 @@ class PDFService
         ]);
     }
 
-    public function generateTicketPDF(int $bookingId): \Symfony\Component\HttpFoundation\StreamedResponse
+    public function generateTicketPDF(int $bookingId)
     {
         $booking = Booking::with(['customer', 'vehicle', 'user'])->findOrFail($bookingId);
         

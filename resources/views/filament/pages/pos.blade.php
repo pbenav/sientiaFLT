@@ -123,9 +123,24 @@
                             
                             <div class="p-3 pl-4">
                                 <div class="flex items-start justify-between mb-2">
-                                    <div class="mt-0.5">
-                                        <div class="font-bold text-gray-800 text-xs">{{ $bkg->vehicle->name ?? 'Desconocido' }}</div>
-                                        <div class="text-[10px] text-gray-400">{{ $bkg->booking_number }}</div>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="font-semibold text-gray-800 text-sm leading-tight mb-0.5 truncate">{{ $bkg->vehicle->name ?? 'Desconocido' }}</div>
+                                        <div class="text-[10px] text-gray-500 flex items-center gap-1">
+                                            <x-filament::icon icon="heroicon-o-calendar" class="w-3 h-3" />
+                                            {{ \Carbon\Carbon::parse($bkg->start_date)->format('d/m') }} - {{ \Carbon\Carbon::parse($bkg->end_date)->format('d/m') }}
+                                        </div>
+                                        @if($bkg->vehicle && $bkg->vehicle->units && $bkg->vehicle->units->count() > 0)
+                                        <div class="mt-1">
+                                            <select wire:change="updateBookingUnit({{ $bkg->id }}, $event.target.value)" class="text-[10px] py-0.5 px-1 border-gray-200 rounded w-full bg-gray-50 text-gray-600 focus:ring-primary-500 focus:border-primary-500">
+                                                <option value="">Matrícula: Auto</option>
+                                                @foreach($bkg->vehicle->units as $unit)
+                                                    <option value="{{ $unit->id }}" @if($bkg->vehicle_unit_id == $unit->id) selected @endif>
+                                                        {{ $unit->license_plate }} {{ $unit->color ? '('.$unit->color.')' : '' }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        @endif
                                     </div>
                                     
                                     <button wire:click="removeBooking({{ $bkg->id }})" 
@@ -142,11 +157,11 @@
                                     <div class="grid grid-cols-2 gap-2">
                                         <div>
                                             <label class="block text-[9px] text-gray-500 mb-1">Entrega</label>
-                                            <input type="datetime-local" x-model="start" x-on:change="$wire.updateDates({{ $bkg->id }}, start, end)" class="w-full text-[11px] text-gray-700 border-gray-200 rounded shadow-sm focus:ring-primary-500 focus:border-primary-500 bg-white py-1 px-2">
+                                            <input type="datetime-local" x-model="start" x-on:change="$wire.updateBookingDates({{ $bkg->id }}, start, end)" class="w-full text-[11px] text-gray-700 border-gray-200 rounded shadow-sm focus:ring-primary-500 focus:border-primary-500 bg-white py-1 px-2">
                                         </div>
                                         <div>
                                             <label class="block text-[9px] text-gray-500 mb-1">Devolución</label>
-                                            <input type="datetime-local" x-model="end" x-on:change="$wire.updateDates({{ $bkg->id }}, start, end)" class="w-full text-[11px] text-gray-700 border-gray-200 rounded shadow-sm focus:ring-primary-500 focus:border-primary-500 bg-white py-1 px-2">
+                                            <input type="datetime-local" x-model="end" x-on:change="$wire.updateBookingDates({{ $bkg->id }}, start, end)" class="w-full text-[11px] text-gray-700 border-gray-200 rounded shadow-sm focus:ring-primary-500 focus:border-primary-500 bg-white py-1 px-2">
                                         </div>
                                     </div>
                                     <div class="mt-2 flex justify-end">

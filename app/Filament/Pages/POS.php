@@ -125,12 +125,26 @@ class POS extends Page
         }
     }
 
-    public function updateDates($bookingId, $startDate, $endDate)
+    public function updateBookingDates($bookingId, $startDate, $endDate)
     {
-        $booking = Booking::where('pos_session_id', $this->currentSessionId)->find($bookingId);
-        if ($booking) {
-            $this->getPosService()->updateBookingDates($booking, $startDate, $endDate);
-            $this->reloadCart();
+        if ($this->currentSessionId) {
+            $booking = \App\Models\Booking::where('pos_session_id', $this->currentSessionId)->find($bookingId);
+            if ($booking) {
+                $this->getPosService()->updateBookingDates($booking, $startDate, $endDate);
+                $this->reloadCart();
+            }
+        }
+    }
+
+    public function updateBookingUnit($bookingId, $unitId)
+    {
+        if ($this->currentSessionId) {
+            $booking = \App\Models\Booking::where('pos_session_id', $this->currentSessionId)->find($bookingId);
+            if ($booking) {
+                $booking->vehicle_unit_id = $unitId ?: null;
+                $booking->save();
+                $this->reloadCart();
+            }
         }
     }
 
@@ -147,7 +161,7 @@ class POS extends Page
     protected function reloadCart()
     {
         if ($this->currentSessionId) {
-            $this->cartBookings = Booking::with(['vehicle'])
+            $this->cartBookings = Booking::with(['vehicle.units'])
                 ->where('pos_session_id', $this->currentSessionId)
                 ->get();
                 
@@ -186,11 +200,17 @@ class POS extends Page
 
         $this->amountPaid = max((float)$this->amountPaid, (float)$this->cartTotal);
         
+        $firstBookingId = $this->cartBookings[0]['id'] ?? null;
         $success = $this->getPosService()->checkoutSession($this->currentSessionId, $this->paymentMethod, $this->amountPaid);
 
         if ($success) {
             $this->dispatch('close-modal', id: 'payment-modal');
             Notification::make()->title('Cobro completado con éxito')->success()->send();
+            
+            if ($firstBookingId) {
+                $this->js("window.open('/pdf/ticket/{$firstBookingId}', '_blank')");
+            }
+
             $this->clearCart();
             $this->loadAvailableVehicles();
         }
