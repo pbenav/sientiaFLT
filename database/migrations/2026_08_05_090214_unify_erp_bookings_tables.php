@@ -8,11 +8,20 @@ return new class extends Migration
 {
     public function up(): void
     {
+        Schema::disableForeignKeyConstraints();
+
         // 1. Remove foreign keys that block dropping tables
         if (Schema::hasColumn('invoices', 'tpv_ticket_id')) {
             Schema::table('invoices', function (Blueprint $table) {
                 $table->dropForeign(['tpv_ticket_id']);
                 $table->dropColumn('tpv_ticket_id');
+            });
+        }
+
+        if (Schema::hasColumn('invoices', 'alquiler_id')) {
+            Schema::table('invoices', function (Blueprint $table) {
+                $table->dropForeign(['alquiler_id']);
+                $table->dropColumn('alquiler_id');
             });
         }
 
@@ -46,6 +55,8 @@ return new class extends Migration
                 $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete()->after('customer_id');
             }
         });
+
+        Schema::enableForeignKeyConstraints();
     }
 
     public function down(): void
