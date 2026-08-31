@@ -7,13 +7,23 @@ use App\Models\Invoice;
 
 class PDFService
 {
+    private function getPdf(): \Barryvdh\DomPDF\PDF
+    {
+        $dompdf = new \Dompdf\Dompdf(app('config')->get('dompdf.options') ?: []);
+        $path = realpath(app('config')->get('dompdf.public_path') ?: base_path('public'));
+        if ($path) {
+            $dompdf->setBasePath($path);
+        }
+        return new \Barryvdh\DomPDF\PDF($dompdf, app('config'), app('files'), app('view'));
+    }
+
     public function generateFacturaPDF(int $invoiceId): \Symfony\Component\HttpFoundation\StreamedResponse
     {
         $invoice = Invoice::with(['booking.customer', 'booking.vehicle'])->findOrFail($invoiceId);
         
         $html = $this->generateFacturaHTML($invoice);
         
-        $pdf = app('dompdf.wrapper')->loadHTML($html)
+        $pdf = $this->getPdf()->loadHTML($html)
             ->setPaper('a4')
             ->setOptions(['isHtml5ParserEnabled' => true, 'isPhpEnabled' => true]);
             
@@ -33,7 +43,7 @@ class PDFService
         
         $html = $this->generateTicketHTML($booking);
         
-        $pdf = app('dompdf.wrapper')->loadHTML($html)
+        $pdf = $this->getPdf()->loadHTML($html)
             ->setPaper([0, 0, 226.77, 400]) // 80mm thermal
             ->setOptions(['isHtml5ParserEnabled' => true, 'isPhpEnabled' => true]);
             
@@ -48,7 +58,7 @@ class PDFService
         $data['booking'] = $booking;
         $data['clauses'] = \App\Models\Setting::get('contract_clauses', "1. El arrendatario asume toda la responsabilidad...");
 
-        $pdf = app('dompdf.wrapper')->loadView('pdf.contrato', $data);
+        $pdf = $this->getPdf()->loadView('pdf.contrato', $data);
         return $pdf->stream('contrato_' . $booking->booking_number . '.pdf');
     }
 
