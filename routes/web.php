@@ -33,3 +33,10 @@ Route::get('/calendar/{vehicle}', [CalendarController::class, 'show'])->name('ca
 Route::get('/pages/{slug}', [PageController::class, 'show'])->name('pages.show');
 Route::get('/menu/{slug}', [PageController::class, 'menu'])->name('menu.show');
 
+// Fallback GET logout
+Route::get('/admin/logout', function () {
+    auth()->logout();
+    request()->session()->invalidate();
+    request()->session()->regenerateToken();
+    return redirect('/');
+});
