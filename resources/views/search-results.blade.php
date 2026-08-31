@@ -102,7 +102,7 @@
                         @foreach($results as $vehicle)
                         <div class="ex-card flex flex-col h-full bg-white shadow-sm hover:shadow-xl transition-all duration-300">
                             <!-- Image Container -->
-                            <div class="relative h-48 overflow-hidden group">
+                            <a href="{{ route('booking.checkout', ['vehicle_id' => $vehicle->id, 'pickup_date' => $pickup->format('Y-m-d'), 'dropoff_date' => $dropoff->format('Y-m-d')]) }}" class="block relative h-48 overflow-hidden group cursor-pointer">
                                 @if($vehicle->primaryImage && $vehicle->primaryImage->url)
                                     <img src="{{ $vehicle->primaryImage->url }}" alt="{{ $vehicle->name }}" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500">
                                 @else
@@ -122,7 +122,7 @@
                                         <span class="bg-blue-600 text-white text-xs font-bold px-2.5 py-1 rounded-sm shadow-sm uppercase tracking-wide">{{ __('Nuevo') }}</span>
                                     @endif
                                 </div>
-                            </div>
+                            </a>
 
                             <!-- Card Body -->
                             <div class="ex-card-body flex-1 flex flex-col p-5">

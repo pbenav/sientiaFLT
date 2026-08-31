@@ -33,7 +33,7 @@ class SearchResultsController extends Controller
         $sort = $request->input('sort', 'price_asc');
         $results = $searchService->searchWithSort($dto, $sort);
 
-        $days = max(1, $pickup->diffInDays($dropoff));
+        $days = (int) max(1, $pickup->diffInDays($dropoff));
 
         return view('search-results', [
             'results' => $results,
