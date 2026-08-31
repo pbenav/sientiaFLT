@@ -110,9 +110,9 @@ class VehicleSeeder extends Seeder
         \DB::table('vehicle_images')->where('path', 'like', '%symphony%')->delete();
         \DB::table('vehicle_images')->where('path', 'like', '%medley%')->delete();
         \DB::table('vehicle_images')->where('path', 'like', '%vespa%')->delete();
-        Vehicle::where('slug', 'like', '%symphony%')->delete();
-        Vehicle::where('slug', 'like', '%medley%')->delete();
-        Vehicle::where('slug', 'like', '%primavera%')->delete();
+        Vehicle::withTrashed()->where('slug', 'like', '%symphony%')->forceDelete();
+        Vehicle::withTrashed()->where('slug', 'like', '%medley%')->forceDelete();
+        Vehicle::withTrashed()->where('slug', 'like', '%primavera%')->forceDelete();
 
         // ============================================================
         // SCOOTER 1: SYM Symphony 125cc
