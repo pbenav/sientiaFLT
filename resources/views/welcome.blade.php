@@ -185,30 +185,59 @@
             <hr class="ex-accent-line">
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            @php
-                $categories = [
-                    ['name' => 'Scooter 125cc', 'slug' => 'scooter', 'image' => '/images/vehicles/sym-symphony-125.jpg', 'from' => '60'],
-                    ['name' => 'Compactos', 'slug' => 'compact', 'image' => '/images/vehicles/fiat-500.jpg', 'from' => '25'],
-                    ['name' => 'SUV', 'slug' => 'suv', 'image' => '/images/vehicles/suv.jpg', 'from' => '45'],
-                    ['name' => 'Furgonetas', 'slug' => 'van', 'image' => '/images/vehicles/van.jpg', 'from' => '55'],
-                ];
-            @endphp
+        @php
+            $featuredVehicles = \App\Models\Vehicle::with('images')
+                ->where('is_active', true)
+                ->where('show_on_homepage', true)
+                ->orderBy('daily_rate')
+                ->take(3)
+                ->get();
+        @endphp
 
-            @foreach($categories as $cat)
-            <div class="ex-card">
-                <div style="height:180px;overflow:hidden;">
-                    <img src="{{ $cat['image'] }}" alt="{{ $cat['name'] }}" class="w-full h-full object-cover"
-                         onerror="this.src='/images/hero/img0002-scaled-1.jpg'">
+        @if($featuredVehicles->count() > 0)
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                @foreach($featuredVehicles as $vehicle)
+                <div class="ex-card group cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 bg-white rounded-2xl border border-gray-100 overflow-hidden">
+                    <div style="height:240px;overflow:hidden;" class="relative bg-gray-50 flex items-center justify-center p-4">
+                        @if($vehicle->images->count() > 0)
+                            <img src="{{ $vehicle->images->first()->url }}" alt="{{ $vehicle->name }}" class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-110 drop-shadow-md" onerror="this.src='/images/hero/img0002-scaled-1.jpg'">
+                        @else
+                            <img src="/images/hero/img0002-scaled-1.jpg" alt="{{ $vehicle->name }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                        @endif
+                        <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-gray-900 shadow-sm border border-gray-100">
+                            {{ $vehicle->engine ?? '125cc' }}
+                        </div>
+                    </div>
+                    <div class="ex-card-body p-6">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">{{ $vehicle->brand }}</span>
+                            <span class="flex items-center text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full">
+                                <span class="w-1.5 h-1.5 rounded-full bg-green-500 mr-1.5"></span>
+                                Disponible
+                            </span>
+                        </div>
+                        <h3 class="ex-card-title text-xl font-bold mb-2 text-gray-900">{{ $vehicle->name }}</h3>
+                        <p class="text-sm text-gray-500 mb-6 line-clamp-2">{{ $vehicle->description ?? 'El scooter perfecto para moverse por Ibiza.' }}</p>
+                        
+                        <div class="flex items-center justify-between mt-auto">
+                            <div>
+                                <p class="text-[10px] text-gray-400 uppercase font-semibold tracking-wider">Desde</p>
+                                <p class="text-ex-accent font-bold text-2xl" style="font-family:'Space Grotesk',sans-serif;">{{ number_format($vehicle->daily_rate, 0) }}€<span class="text-sm text-gray-500 font-normal">/día</span></p>
+                            </div>
+                            <a href="/search?type={{ $vehicle->slug }}" class="ex-btn ex-btn-primary px-6 py-2 rounded-xl group-hover:shadow-lg group-hover:shadow-red-500/20 transition-all">
+                                Reservar
+                            </a>
+                        </div>
+                    </div>
                 </div>
-                <div class="ex-card-body">
-                    <h3 class="ex-card-title">{{ $cat['name'] }}</h3>
-                    <p class="ex-card-text">Desde <span class="text-ex-accent" style="font-weight:700;font-size:1.1rem;">{{ $cat['from'] }}€</span>/día</p>
-                    <a href="/search?type={{ $cat['slug'] }}" class="ex-btn ex-btn-primary ex-btn-sm" style="width:100%;">Ver Vehículos</a>
-                </div>
+                @endforeach
             </div>
-            @endforeach
-        </div>
+        @else
+            <!-- Fallback if no vehicles are seeded yet -->
+            <div class="text-center py-10 bg-gray-50 rounded-2xl border border-gray-100">
+                <p class="text-gray-500">Nuestra flota se está actualizando. Por favor, vuelve pronto.</p>
+            </div>
+        @endif
     </div>
 </section>
 
