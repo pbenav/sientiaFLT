@@ -24,7 +24,7 @@ class CustomerResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Personal Information')
+                Forms\Components\Section::make(__('Personal Information'))
                     ->schema([
                         Forms\Components\TextInput::make('first_name')
                             ->required()
@@ -48,7 +48,7 @@ class CustomerResource extends Resource
                             ->columnSpan(2),
                     ])->columns(2),
 
-                Forms\Components\Section::make('Company Details')
+                Forms\Components\Section::make(__('Company Details'))
                     ->schema([
                         Forms\Components\TextInput::make('company_name')
                             ->maxLength(255),
@@ -57,7 +57,7 @@ class CustomerResource extends Resource
                             ->maxLength(50),
                     ])->columns(2),
 
-                Forms\Components\Section::make('Address')
+                Forms\Components\Section::make(__('Address'))
                     ->schema([
                         Forms\Components\Textarea::make('address')
                             ->maxLength(500)
@@ -73,14 +73,14 @@ class CustomerResource extends Resource
                             ->default('ES'),
                     ])->columns(2),
 
-                Forms\Components\Section::make('Preferences')
+                Forms\Components\Section::make(__('Preferences'))
                     ->schema([
                         Forms\Components\Select::make('locale')
                             ->options([
-                                'es' => 'Spanish',
-                                'en' => 'English',
-                                'fr' => 'French',
-                                'de' => 'German',
+                                'es' => 'Español',
+                                'en' => 'Inglés',
+                                'fr' => 'Francés',
+                                'de' => 'Alemán',
                             ])
                             ->default('es'),
                         Forms\Components\Select::make('currency_code')
@@ -139,8 +139,8 @@ class CustomerResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('is_company')
                     ->options([
-                        '1' => 'Company',
-                        '0' => 'Individual',
+                        '1' => 'Empresa',
+                        '0' => 'Particular',
                     ]),
                 Tables\Filters\TernaryFilter::make('is_active')
                     ->label('Active Status'),

@@ -12,7 +12,7 @@ class ReviewsRelationManager extends RelationManager
 {
     protected static string $relationship = 'reviews';
 
-    protected static ?string $title = 'Reviews';
+    protected static ?string $title = 'Reseñas';
 
     public function form(Form $form): Form
     {
@@ -53,9 +53,9 @@ class ReviewsRelationManager extends RelationManager
             ->filters([
                 Tables\Filters\TernaryFilter::make('is_approved')
                     ->label('Approval Status')
-                    ->placeholder('All')
-                    ->trueLabel('Approved')
-                    ->falseLabel('Not Approved'),
+                    ->placeholder('Todos')
+                    ->trueLabel('Aprobada')
+                    ->falseLabel('No Aprobada'),
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make(),

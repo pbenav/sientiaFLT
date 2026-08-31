@@ -29,9 +29,9 @@ class InvoiceRelationManager extends RelationManager
                 Forms\Components\Select::make('type')
                     ->required()
                     ->options([
-                        'rental' => 'Rental Invoice',
-                        'deposit' => 'Deposit Invoice',
-                        'additional' => 'Additional Charges',
+                        'rental' => 'Factura de Alquiler',
+                        'deposit' => 'Factura de Fianza',
+                        'additional' => 'Cargos Adicionales',
                     ]),
                 Forms\Components\DatePicker::make('issue_date'),
                 Forms\Components\DatePicker::make('due_date'),
@@ -48,11 +48,11 @@ class InvoiceRelationManager extends RelationManager
                 Forms\Components\Select::make('status')
                     ->required()
                     ->options([
-                        'draft' => 'Draft',
-                        'sent' => 'Sent',
-                        'paid' => 'Paid',
-                        'overdue' => 'Overdue',
-                        'cancelled' => 'Cancelled',
+                        'draft' => 'Borrador',
+                        'sent' => 'Enviada',
+                        'paid' => 'Cobrada',
+                        'overdue' => 'Vencida',
+                        'cancelled' => 'Cancelada',
                     ]),
             ]);
     }
@@ -85,11 +85,11 @@ class InvoiceRelationManager extends RelationManager
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
                     ->options([
-                        'draft' => 'Draft',
-                        'sent' => 'Sent',
-                        'paid' => 'Paid',
-                        'overdue' => 'Overdue',
-                        'cancelled' => 'Cancelled',
+                        'draft' => 'Borrador',
+                        'sent' => 'Enviada',
+                        'paid' => 'Cobrada',
+                        'overdue' => 'Vencida',
+                        'cancelled' => 'Cancelada',
                     ]),
             ])
             ->headerActions([

@@ -103,7 +103,7 @@ class PageResource extends Resource
                             ->options([
                                 'default' => 'Por defecto',
                                 'fullwidth' => 'Ancho completo',
-                                'landing' => 'Landing page',
+                                'landing' => 'Página de aterrizaje',
                             ])
                             ->default('default'),
 
@@ -112,7 +112,7 @@ class PageResource extends Resource
                             ->options([
                                 'layouts.app' => 'Layout principal',
                                 'layouts.nofooter' => 'Sin footer',
-                                'layouts.minimal' => 'Minimal',
+                                'layouts.minimal' => 'Mínimo',
                             ])
                             ->default('layouts.app'),
                     ])

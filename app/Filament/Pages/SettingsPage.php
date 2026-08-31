@@ -11,6 +11,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Form;
 use Filament\Pages\Page;
@@ -158,7 +159,7 @@ class SettingsPage extends Page
                         Tabs\Tab::make('Contrato de Alquiler')
                             ->icon('heroicon-o-document-text')
                             ->schema([
-                                Forms\Components\RichEditor::make('contract_clauses')
+                                RichEditor::make('contract_clauses')
                                     ->label('Cláusulas por defecto del contrato de alquiler')
                                     ->helperText('Estas cláusulas se insertarán automáticamente en la impresión del contrato de alquiler que firma el cliente.')
                                     ->columnSpanFull(),

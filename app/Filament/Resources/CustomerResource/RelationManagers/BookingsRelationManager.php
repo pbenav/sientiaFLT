@@ -12,7 +12,7 @@ class BookingsRelationManager extends RelationManager
 {
     protected static string $relationship = 'bookings';
 
-    protected static ?string $title = 'Bookings';
+    protected static ?string $title = 'Reservas';
 
     public function form(Form $form): Form
     {
@@ -28,11 +28,11 @@ class BookingsRelationManager extends RelationManager
                 Forms\Components\Select::make('status')
                     ->required()
                     ->options([
-                        'pending' => 'Pending',
-                        'confirmed' => 'Confirmed',
-                        'active' => 'Active',
-                        'completed' => 'Completed',
-                        'cancelled' => 'Cancelled',
+                        'pending' => 'Pendiente',
+                        'confirmed' => 'Confirmada',
+                        'active' => 'Activa',
+                        'completed' => 'Completada',
+                        'cancelled' => 'Cancelada',
                     ]),
             ]);
     }
@@ -75,11 +75,11 @@ class BookingsRelationManager extends RelationManager
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
                     ->options([
-                        'pending' => 'Pending',
-                        'confirmed' => 'Confirmed',
-                        'active' => 'Active',
-                        'completed' => 'Completed',
-                        'cancelled' => 'Cancelled',
+                        'pending' => 'Pendiente',
+                        'confirmed' => 'Confirmada',
+                        'active' => 'Activa',
+                        'completed' => 'Completada',
+                        'cancelled' => 'Cancelada',
                     ]),
             ])
             ->headerActions([
