@@ -28,6 +28,8 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             PageMenuSeeder::class,
+            VehicleSeeder::class,
+            AdminUserSeeder::class,
         ]);
     }
 }
