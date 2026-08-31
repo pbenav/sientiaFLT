@@ -29,6 +29,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             PageMenuSeeder::class,
             VehicleSeeder::class,
+            TaxSeeder::class,
             AdminUserSeeder::class,
         ]);
     }
