@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Models\Booking;
 use App\Models\Invoice;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 class PDFService
 {
@@ -14,7 +13,7 @@ class PDFService
         
         $html = $this->generateFacturaHTML($invoice);
         
-        $pdf = Pdf::loadHTML($html)
+        $pdf = app('dompdf.wrapper')->loadHTML($html)
             ->setPaper('a4')
             ->setOptions(['isHtml5ParserEnabled' => true, 'isPhpEnabled' => true]);
             
@@ -34,7 +33,7 @@ class PDFService
         
         $html = $this->generateTicketHTML($booking);
         
-        $pdf = Pdf::loadHTML($html)
+        $pdf = app('dompdf.wrapper')->loadHTML($html)
             ->setPaper([0, 0, 226.77, 400]) // 80mm thermal
             ->setOptions(['isHtml5ParserEnabled' => true, 'isPhpEnabled' => true]);
             
@@ -45,11 +44,11 @@ class PDFService
     {
         $booking = Booking::with(['customer', 'vehicle', 'unit'])->findOrFail($bookingId);
 
-        $data = $this->getBaseData();
+        $data = [];
         $data['booking'] = $booking;
-        $data['clauses'] = Setting::get('contract_clauses', "1. El arrendatario asume toda la responsabilidad...");
+        $data['clauses'] = \App\Models\Setting::get('contract_clauses', "1. El arrendatario asume toda la responsabilidad...");
 
-        $pdf = FacadesPdf::loadView('pdf.contrato', $data);
+        $pdf = app('dompdf.wrapper')->loadView('pdf.contrato', $data);
         return $pdf->stream('contrato_' . $booking->booking_number . '.pdf');
     }
 
